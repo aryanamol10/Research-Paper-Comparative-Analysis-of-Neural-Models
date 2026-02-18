@@ -20,10 +20,10 @@ Using PyTorch and TensorFlow, I measured how architectural complexity impacts:
 
 ## Key Findings
 * **Latency**: Through a graphed data analysis of Matplotlib (prediction/epoch rates), I found that the Modular (Neural Chain) architecture produced consistent results showing faster
-* time rates than the Parallel and Sequential structures through all the linear, curved, and chain environments.
+time rates than the Parallel and Sequential structures through all the linear, curved, and chain environments.
 * **Prediction(MSE)**: While Modular structure was able to produce accruate results in standard scenarios, in the case of the most complex environment(Chained regression), the sequential model
-* was able to produce a better predictive accuracy (lower MSE). This suggests that while in most scenarios the modular environment has better capabilities and environments,
-* specifically within complex data scenarios, the sequential structure proves to be better than the Modular approach.
+was able to produce a better predictive accuracy (lower MSE). This suggests that while in most scenarios the modular environment has better capabilities and environments,
+specifically within complex data scenarios, the sequential structure proves to be better than the Modular approach.
 
 
 
