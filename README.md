@@ -1,4 +1,4 @@
-# Comparative Analysis Modular, Sequential, and Parallel Neural Network Architectures on Inference Accuracy and Time
+# Comparative Analysis of Modular, Sequential, and Parallel Neural Architectures on Inference Accuracy and Latency
 **Author:** Aryan Kulkarni (Bellarmine College Preparatory)
 
 I am a student at Bellarmine College Preparatory with a deep interest in the intersection of computational logic and machine learning. 
