@@ -23,7 +23,7 @@ Using PyTorch and TensorFlow, I measured how architectural complexity impacts:
 time rates than the Parallel and Sequential structures through all the linear, curved, and chain environments.
 * **Prediction(MSE)**: While Modular structure was able to produce accurate results in standard scenarios, in the case of the most complex environment(Chained regression), the sequential model
 was able to produce a better predictive accuracy (lower MSE). This suggests that while in most scenarios the modular environment has better capabilities and environments,
-specifically within complex data scenarios, the sequential structure proves to be better than the modular approach.
+specifically within complex data scenarios, the sequential structure proves to be better a better approach.
 
 ## References and Information
 [Comparative Analysis Research Project](https://docs.google.com/document/d/1Jm30c5ztASMwZWHFNBRwAh4G0jRv6rzJrAk_rQcvmyc/edit?usp=sharing).
