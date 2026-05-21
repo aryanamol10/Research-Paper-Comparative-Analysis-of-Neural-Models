@@ -26,7 +26,7 @@ was able to produce a better predictive accuracy (lower MSE). This suggests that
 specifically within complex data scenarios, the sequential structure proves to be better a better approach.
 
 ## References and Information
-[Comparative Analysis Research Project]([https://docs.google.com/document/d/1Jm30c5ztASMwZWHFNBRwAh4G0jRv6rzJrAk_rQcvmyc/edit?usp=sharing](https://drive.google.com/file/d/15B0jb1Th5SHw091OV5EDQJ7RKEgEiOkB/view?usp=drive_link)).
+[Comparative Analysis Research Project](https://drive.google.com/file/d/15B0jb1Th5SHw091OV5EDQJ7RKEgEiOkB/view?usp=drive_link).
 
 
 
