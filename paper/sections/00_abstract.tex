@@ -1,0 +1,19 @@
+\begin{abstract}
+Architecture comparisons often use parameter counts or FLOPs as proxies for speed, but deployed systems are judged
+by latency. We benchmark six small neural architectures, three single-paradigm models (sequential, parallel, modular)
+and three hybrids combining depth, breadth, and modularity, all held to 385 parameters ($\pm$0.5\%) and evaluated on
+three  regression tasks with five seeds each. A pilot study suggested a \pilotSpeedup$\times$ speedup for
+modular networks. An examination traced it to a cross-framework confound and uninformative inputs, and we present it as
+a case study in benchmarking pitfalls. In the corrected study, every topology reaches the noise floor on simple
+tasks. On a composition task, a staged modular hybrid lowers test error by \chainHBGain\% relative to a
+sequential baseline ($p<0.05$) and converges in far fewer epochs, at \latOneRatioHB$\times$ the single-sample
+latency. Across models, single-sample latency is almost perfectly predicted by tensor operations per forward call
+($R^2=\opsFitRsq$) rather than by parameter count, and at large batch sizes the ranking inverts in favor of
+narrow-activation designs. Smaller architectures should therefore be compared at the deployment batch size,
+with operator counts reported alongside parameters.
+\end{abstract}
+
+\begin{IEEEkeywords}
+neural network architecture, hybrid architectures, modular networks, inference latency, benchmarking,
+efficient machine learning, reproducibility
+\end{IEEEkeywords}

@@ -1,0 +1,402 @@
+% references.bib -- verified against Crossref, arXiv API, PMLR, JMLR, NeurIPS/MLSys/USENIX proceedings pages
+% (October 2026). Fields not confirmed from a primary source have been omitted rather than guessed.
+
+%% ---------------------------------------------------------------------------
+%% 1. Foundations
+%% ---------------------------------------------------------------------------
+
+@article{cybenko1989approximation,
+  author  = {Cybenko, George},
+  title   = {Approximation by Superpositions of a Sigmoidal Function},
+  journal = {Mathematics of Control, Signals and Systems},
+  volume  = {2},
+  number  = {4},
+  pages   = {303--314},
+  year    = {1989},
+  doi     = {10.1007/BF02551274}
+}
+
+@article{hornik1989multilayer,
+  author  = {Hornik, Kurt and Stinchcombe, Maxwell and White, Halbert},
+  title   = {Multilayer Feedforward Networks Are Universal Approximators},
+  journal = {Neural Networks},
+  volume  = {2},
+  number  = {5},
+  pages   = {359--366},
+  year    = {1989},
+  doi     = {10.1016/0893-6080(89)90020-8}
+}
+
+@inproceedings{eldan2016power,
+  author    = {Eldan, Ronen and Shamir, Ohad},
+  title     = {The Power of Depth for Feedforward Neural Networks},
+  booktitle = {Proceedings of the 29th Conference on Learning Theory (COLT)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {49},
+  pages     = {907--940},
+  year      = {2016},
+  note      = {arXiv:1512.03965}
+}
+
+@inproceedings{telgarsky2016benefits,
+  author    = {Telgarsky, Matus},
+  title     = {Benefits of Depth in Neural Networks},
+  booktitle = {Proceedings of the 29th Conference on Learning Theory (COLT)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {49},
+  pages     = {1517--1539},
+  year      = {2016},
+  note      = {arXiv:1602.04485}
+}
+
+@inproceedings{lu2017expressive,
+  author    = {Lu, Zhou and Pu, Hongming and Wang, Feicheng and Hu, Zhiqiang and Wang, Liwei},
+  title     = {The Expressive Power of Neural Networks: A View from the Width},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+  note      = {arXiv:1709.02540}
+}
+
+@inproceedings{kingma2015adam,
+  author    = {Kingma, Diederik P. and Ba, Jimmy},
+  title     = {Adam: A Method for Stochastic Optimization},
+  booktitle = {Proceedings of the 3rd International Conference on Learning Representations (ICLR)},
+  year      = {2015},
+  note      = {arXiv:1412.6980}
+}
+
+@inproceedings{nair2010rectified,
+  author    = {Nair, Vinod and Hinton, Geoffrey E.},
+  title     = {Rectified Linear Units Improve Restricted {Boltzmann} Machines},
+  booktitle = {Proceedings of the 27th International Conference on Machine Learning (ICML)},
+  pages     = {807--814},
+  year      = {2010}
+}
+
+@inproceedings{glorot2011deep,
+  author    = {Glorot, Xavier and Bordes, Antoine and Bengio, Yoshua},
+  title     = {Deep Sparse Rectifier Neural Networks},
+  booktitle = {Proceedings of the Fourteenth International Conference on Artificial Intelligence and Statistics (AISTATS)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {15},
+  pages     = {315--323},
+  year      = {2011}
+}
+
+@inproceedings{ioffe2015batch,
+  author    = {Ioffe, Sergey and Szegedy, Christian},
+  title     = {Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift},
+  booktitle = {Proceedings of the 32nd International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {37},
+  pages     = {448--456},
+  year      = {2015}
+}
+
+@inproceedings{paszke2019pytorch,
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and K{\"o}pf, Andreas and Yang, Edward and DeVito, Zach and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019},
+  note      = {arXiv:1912.01703}
+}
+
+@inproceedings{abadi2016tensorflow,
+  author    = {Abadi, Mart{\'\i}n and Barham, Paul and Chen, Jianmin and Chen, Zhifeng and Davis, Andy and Dean, Jeffrey and Devin, Matthieu and Ghemawat, Sanjay and Irving, Geoffrey and Isard, Michael and Kudlur, Manjunath and Levenberg, Josh and Monga, Rajat and Moore, Sherry and Murray, Derek G. and Steiner, Benoit and Tucker, Paul and Vasudevan, Vijay and Warden, Pete and Wicke, Martin and Yu, Yuan and Zheng, Xiaoqiang},
+  title     = {{TensorFlow}: A System for Large-Scale Machine Learning},
+  booktitle = {12th USENIX Symposium on Operating Systems Design and Implementation (OSDI)},
+  pages     = {265--283},
+  year      = {2016}
+}
+
+@misc{chollet2015keras,
+  author       = {Chollet, Fran{\c{c}}ois and others},
+  title        = {Keras},
+  howpublished = {\url{https://keras.io}},
+  year         = {2015}
+}
+
+%% ---------------------------------------------------------------------------
+%% 2. Parallel / multi-branch architectures and multi-task learning
+%% ---------------------------------------------------------------------------
+
+@inproceedings{szegedy2015going,
+  author    = {Szegedy, Christian and Liu, Wei and Jia, Yangqing and Sermanet, Pierre and Reed, Scott and Anguelov, Dragomir and Erhan, Dumitru and Vanhoucke, Vincent and Rabinovich, Andrew},
+  title     = {Going Deeper with Convolutions},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {1--9},
+  year      = {2015},
+  doi       = {10.1109/CVPR.2015.7298594}
+}
+
+@inproceedings{xie2017resnext,
+  author    = {Xie, Saining and Girshick, Ross and Doll{\'a}r, Piotr and Tu, Zhuowen and He, Kaiming},
+  title     = {Aggregated Residual Transformations for Deep Neural Networks},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {5987--5995},
+  year      = {2017},
+  doi       = {10.1109/CVPR.2017.634}
+}
+
+@inproceedings{zagoruyko2016wide,
+  author    = {Zagoruyko, Sergey and Komodakis, Nikos},
+  title     = {Wide Residual Networks},
+  booktitle = {Proceedings of the British Machine Vision Conference (BMVC)},
+  pages     = {87.1--87.12},
+  year      = {2016},
+  doi       = {10.5244/C.30.87}
+}
+
+@article{caruana1997multitask,
+  author  = {Caruana, Rich},
+  title   = {Multitask Learning},
+  journal = {Machine Learning},
+  volume  = {28},
+  number  = {1},
+  pages   = {41--75},
+  year    = {1997},
+  doi     = {10.1023/A:1007379606734}
+}
+
+@misc{ruder2017overview,
+  author        = {Ruder, Sebastian},
+  title         = {An Overview of Multi-Task Learning in Deep Neural Networks},
+  year          = {2017},
+  eprint        = {1706.05098},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:1706.05098}
+}
+
+@inproceedings{lakshminarayanan2017simple,
+  author    = {Lakshminarayanan, Balaji and Pritzel, Alexander and Blundell, Charles},
+  title     = {Simple and Scalable Predictive Uncertainty Estimation Using Deep Ensembles},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017},
+  note      = {arXiv:1612.01474}
+}
+
+%% ---------------------------------------------------------------------------
+%% 3. Modular networks, skip/dense connections, compositionality
+%% ---------------------------------------------------------------------------
+
+@article{jacobs1991adaptive,
+  author  = {Jacobs, Robert A. and Jordan, Michael I. and Nowlan, Steven J. and Hinton, Geoffrey E.},
+  title   = {Adaptive Mixtures of Local Experts},
+  journal = {Neural Computation},
+  volume  = {3},
+  number  = {1},
+  pages   = {79--87},
+  year    = {1991},
+  doi     = {10.1162/neco.1991.3.1.79}
+}
+
+@inproceedings{shazeer2017outrageously,
+  author    = {Shazeer, Noam and Mirhoseini, Azalia and Maziarz, Krzysztof and Davis, Andy and Le, Quoc and Hinton, Geoffrey and Dean, Jeff},
+  title     = {Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer},
+  booktitle = {Proceedings of the 5th International Conference on Learning Representations (ICLR)},
+  year      = {2017},
+  note      = {arXiv:1701.06538}
+}
+
+@inproceedings{andreas2016neural,
+  author    = {Andreas, Jacob and Rohrbach, Marcus and Darrell, Trevor and Klein, Dan},
+  title     = {Neural Module Networks},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {39--48},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.12}
+}
+
+@article{pfeiffer2023modular,
+  author  = {Pfeiffer, Jonas and Ruder, Sebastian and Vuli{\'c}, Ivan and Ponti, Edoardo Maria},
+  title   = {Modular Deep Learning},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2023},
+  note    = {arXiv:2302.11529}
+}
+
+@inproceedings{he2016resnet,
+  author    = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  title     = {Deep Residual Learning for Image Recognition},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {770--778},
+  year      = {2016},
+  doi       = {10.1109/CVPR.2016.90}
+}
+
+@inproceedings{huang2017densenet,
+  author    = {Huang, Gao and Liu, Zhuang and van der Maaten, Laurens and Weinberger, Kilian Q.},
+  title     = {Densely Connected Convolutional Networks},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {2261--2269},
+  year      = {2017},
+  doi       = {10.1109/CVPR.2017.243}
+}
+
+@article{hupkes2020compositionality,
+  author  = {Hupkes, Dieuwke and Dankers, Verna and Mul, Mathijs and Bruni, Elia},
+  title   = {Compositionality Decomposed: How Do Neural Networks Generalise?},
+  journal = {Journal of Artificial Intelligence Research},
+  volume  = {67},
+  pages   = {757--795},
+  year    = {2020},
+  doi     = {10.1613/jair.1.11674}
+}
+
+%% ---------------------------------------------------------------------------
+%% 4. Inference latency, efficiency metrics, benchmarking methodology
+%% ---------------------------------------------------------------------------
+
+@inproceedings{reddi2020mlperf,
+  author    = {Reddi, Vijay Janapa and Cheng, Christine and Kanter, David and Mattson, Peter and Schmuelling, Guenther and Wu, Carole-Jean and Anderson, Brian and Breughe, Maximilien and Charlebois, Mark and Chou, William and Chukka, Ramesh and Coleman, Cody and Davis, Sam and Deng, Pan and Diamos, Greg and Duke, Jared and Fick, Dave and Gardner, J. Scott and Hubara, Itay and Idgunji, Sachin and Jablin, Thomas B. and Jiao, Jeff and St. John, Tom and Kanwar, Pankaj and Lee, David and Liao, Jeffery and Lokhmotov, Anton and Massa, Francisco and Meng, Peng and Micikevicius, Paulius and Osborne, Colin and Pekhimenko, Gennady and Rajan, Arun Tejusve Raghunath and Sequeira, Dilip and Sirasao, Ashish and Sun, Fei and Tang, Hanlin and Thomson, Michael and Wei, Frank and Wu, Ephrem and Xu, Lingjie and Yamada, Koichi and Yu, Bing and Yuan, George and Zhong, Aaron and Zhang, Peizhao and Zhou, Yuchen},
+  title     = {{MLPerf} Inference Benchmark},
+  booktitle = {Proceedings of the ACM/IEEE 47th Annual International Symposium on Computer Architecture (ISCA)},
+  pages     = {446--459},
+  year      = {2020},
+  doi       = {10.1109/ISCA45697.2020.00045}
+}
+
+@article{sze2017efficient,
+  author  = {Sze, Vivienne and Chen, Yu-Hsin and Yang, Tien-Ju and Emer, Joel S.},
+  title   = {Efficient Processing of Deep Neural Networks: A Tutorial and Survey},
+  journal = {Proceedings of the IEEE},
+  volume  = {105},
+  number  = {12},
+  pages   = {2295--2329},
+  year    = {2017},
+  doi     = {10.1109/JPROC.2017.2761740}
+}
+
+@misc{canziani2016analysis,
+  author        = {Canziani, Alfredo and Paszke, Adam and Culurciello, Eugenio},
+  title         = {An Analysis of Deep Neural Network Models for Practical Applications},
+  year          = {2016},
+  eprint        = {1605.07678},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:1605.07678}
+}
+
+@inproceedings{ma2018shufflenetv2,
+  author    = {Ma, Ningning and Zhang, Xiangyu and Zheng, Hai-Tao and Sun, Jian},
+  title     = {{ShuffleNet V2}: Practical Guidelines for Efficient {CNN} Architecture Design},
+  booktitle = {Computer Vision -- ECCV 2018},
+  series    = {Lecture Notes in Computer Science},
+  pages     = {122--138},
+  publisher = {Springer},
+  year      = {2018},
+  doi       = {10.1007/978-3-030-01264-9_8}
+}
+
+@inproceedings{dehghani2022efficiency,
+  author    = {Dehghani, Mostafa and Arnab, Anurag and Beyer, Lucas and Vaswani, Ashish and Tay, Yi},
+  title     = {The Efficiency Misnomer},
+  booktitle = {Proceedings of the 10th International Conference on Learning Representations (ICLR)},
+  year      = {2022},
+  note      = {arXiv:2110.12894}
+}
+
+@inproceedings{tan2019mnasnet,
+  author    = {Tan, Mingxing and Chen, Bo and Pang, Ruoming and Vasudevan, Vijay and Sandler, Mark and Howard, Andrew and Le, Quoc V.},
+  title     = {{MnasNet}: Platform-Aware Neural Architecture Search for Mobile},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  pages     = {2815--2823},
+  year      = {2019},
+  doi       = {10.1109/CVPR.2019.00293}
+}
+
+@inproceedings{cai2019proxylessnas,
+  author    = {Cai, Han and Zhu, Ligeng and Han, Song},
+  title     = {{ProxylessNAS}: Direct Neural Architecture Search on Target Task and Hardware},
+  booktitle = {Proceedings of the 7th International Conference on Learning Representations (ICLR)},
+  year      = {2019},
+  note      = {arXiv:1812.00332}
+}
+
+@inproceedings{bouthillier2021accounting,
+  author    = {Bouthillier, Xavier and Delaunay, Pierre and Bronzi, Mirko and Trofimov, Assya and Nichyporuk, Brennan and Szeto, Justin and Sepah, Naz and Raff, Edward and Madan, Kanika and Voleti, Vikram and Kahou, Samira Ebrahimi and Michalski, Vincent and Serdyuk, Dmitriy and Arbel, Tal and Pal, Chris and Varoquaux, Ga{\"e}l and Vincent, Pascal},
+  title     = {Accounting for Variance in Machine Learning Benchmarks},
+  booktitle = {Proceedings of Machine Learning and Systems (MLSys)},
+  volume    = {3},
+  pages     = {747--769},
+  year      = {2021}
+}
+
+@inproceedings{henderson2018deep,
+  author    = {Henderson, Peter and Islam, Riashat and Bachman, Philip and Pineau, Joelle and Precup, Doina and Meger, David},
+  title     = {Deep Reinforcement Learning That Matters},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {32},
+  number    = {1},
+  year      = {2018},
+  doi       = {10.1609/aaai.v32i1.11694}
+}
+
+@article{lipton2019troubling,
+  author  = {Lipton, Zachary C. and Steinhardt, Jacob},
+  title   = {Troubling Trends in Machine Learning Scholarship},
+  journal = {Queue},
+  volume  = {17},
+  number  = {1},
+  pages   = {45--77},
+  year    = {2019},
+  doi     = {10.1145/3317287.3328534}
+}
+
+@inproceedings{shi2016benchmarking,
+  author    = {Shi, Shaohuai and Wang, Qiang and Xu, Pengfei and Chu, Xiaowen},
+  title     = {Benchmarking State-of-the-Art Deep Learning Software Tools},
+  booktitle = {Proceedings of the 7th International Conference on Cloud Computing and Big Data (CCBD)},
+  pages     = {99--104},
+  year      = {2016},
+  doi       = {10.1109/CCBD.2016.029}
+}
+
+@article{coleman2019dawnbench,
+  author  = {Coleman, Cody and Kang, Daniel and Narayanan, Deepak and Nardi, Luigi and Zhao, Tian and Zhang, Jian and Bailis, Peter and Olukotun, Kunle and R{\'e}, Chris and Zaharia, Matei},
+  title   = {Analysis of {DAWNBench}, a Time-to-Accuracy Machine Learning Performance Benchmark},
+  journal = {ACM SIGOPS Operating Systems Review},
+  volume  = {53},
+  number  = {1},
+  pages   = {14--25},
+  year    = {2019},
+  doi     = {10.1145/3352020.3352024}
+}
+
+%% ---------------------------------------------------------------------------
+%% 5. Small / edge / TinyML efficiency
+%% ---------------------------------------------------------------------------
+
+@inproceedings{banbury2021mlperftiny,
+  author    = {Banbury, Colby and Reddi, Vijay Janapa and Torelli, Peter and Holleman, Jeremy and Jeffries, Nat and Kiraly, Csaba and Montino, Pietro and Kanter, David and Ahmed, Sebastian and Pau, Danilo and Thakker, Urmish and Torrini, Antonio and Warden, Peter and Cordaro, Jay and Di Guglielmo, Giuseppe and Duarte, Javier and Gibellini, Stephen and Parekh, Videet and Tran, Honson and Tran, Nhan and Wenxu, Niu and Xuesong, Xu},
+  title     = {{MLPerf} Tiny Benchmark},
+  booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+  volume    = {1},
+  year      = {2021},
+  note      = {arXiv:2106.07597}
+}
+
+@misc{howard2017mobilenets,
+  author        = {Howard, Andrew G. and Zhu, Menglong and Chen, Bo and Kalenichenko, Dmitry and Wang, Weijun and Weyand, Tobias and Andreetto, Marco and Adam, Hartwig},
+  title         = {{MobileNets}: Efficient Convolutional Neural Networks for Mobile Vision Applications},
+  year          = {2017},
+  eprint        = {1704.04861},
+  archivePrefix = {arXiv},
+  howpublished  = {arXiv preprint arXiv:1704.04861}
+}
+
+%% ---------------------------------------------------------------------------
+%% 6. Neural architecture search
+%% ---------------------------------------------------------------------------
+
+@article{elsken2019nas,
+  author  = {Elsken, Thomas and Metzen, Jan Hendrik and Hutter, Frank},
+  title   = {Neural Architecture Search: A Survey},
+  journal = {Journal of Machine Learning Research},
+  volume  = {20},
+  number  = {55},
+  pages   = {1--21},
+  year    = {2019}
+}

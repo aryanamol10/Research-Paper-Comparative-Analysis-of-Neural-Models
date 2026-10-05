@@ -1,0 +1,4 @@
+.DS_Store
+# Paper build artifacts (regenerate with paper/scripts/package_overleaf.sh)
+paper/overleaf_*.zip
+paper/overleaf_*/

@@ -1,0 +1,42 @@
+\section{Introduction}
+\label{sec:intro}
+
+Choosing a neural architecture means choosing how to spend constant budgets of parameters and compute. The same
+budget can buy depth (precision in layers), breadth (paralell bindings), or modularity (
+sub-networks that each handle part of a problem). Modern systems increasingly mix all three of these types: multi-branch
+blocks~\cite{szegedy2015going,xie2017resnext}, shared trunks with task heads~\cite{caruana1997multitask}, and
+mixtures of experts~\cite{shazeer2017outrageously}. Theory says depth and width trade off in representational
+power~\cite{eldan2016power,lu2017expressive}. People working on this, however, also care about a different concept:
+\emph{how fast does the model answer?}
+
+Latency is notoriously hard to predict from the numbers that architecture papers usually report. Parameter
+count and FLOPs can disagree with the measured speed and can create a reverse in the model's
+rankings~\cite{ma2018shufflenetv2,dehghani2022efficiency}. The gap is widest for small models, such as those in
+embedded control, sensor fusion, or TinyML~\cite{banbury2021mlperftiny}, where fixed per-operator overhead,
+rather than arithmetic, can dominate run time~\cite{sze2017efficient}. Benchmarks of such models are also easy to
+get wrong. Framework choice, seed variance, and evaluation shortcuts can each produce differences larger
+than the effect being studied~\cite{shi2016benchmarking,bouthillier2021accounting}.
+
+This paper asks: \emph{at a fixed parameter budget, does the arrangement of parameters (sequential, parallel,
+modular, or a hybrid) change accuracy and inference latency, and what predicts the latency?} We answer with a
+controlled benchmark of six architectures at 385 parameters ($\pm$0.5\%) on three synthetic regression tasks of
+increasing structural complexity. Synthetic tasks let us know the irreducible error exactly and let us design one task
+whose compositional structure a modular model could benefit from.
+
+\textbf{Contributions.}
+\begin{itemize}
+\item A \emph{parameter-matched benchmark} of three single-paradigm and three hybrid MLP architectures,
+with five seeds, held-out evaluation, and null control (two functionally identical models), released
+with all code and raw results.
+\item An \emph{audited pilot study} showing how a cross-system comparison produced a false
+\pilotSpeedup$\times$ ``modular speedup'', and three low-cost practices that catch such errors.
+\item Evidence that \emph{structure helps only when the task has structure}. All topologies tie on simple
+targets, but a staged modular hybrid reduces error on a composed target by \chainHBGain\% and mixes much
+faster.
+\item A latency analysis showing that, for small models, \emph{single-sample latency is predicted by operator
+count} ($R^2=\opsFitRsq$) rather than parameters or MACs, and that the latency ranking \emph{depends on batch
+size}.
+\end{itemize}
+
+\Cref{sec:related} reviews related work, \cref{sec:method} describes the setup, \cref{sec:pilot} audits the pilot,
+\cref{sec:results} presents results, and \cref{sec:discussion} discusses implications and limitations.

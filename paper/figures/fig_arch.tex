@@ -1,0 +1,103 @@
+% Architecture schematics for the six parameter-matched models (Section III).
+% FC n = fully connected layer with n outputs; R = ReLU. Edit freely in Overleaf.
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  font=\scriptsize,
+  >={Stealth[length=1.6mm]},
+  io/.style={circle, draw=black!70, minimum size=4.2mm, inner sep=0pt},
+  fc/.style={rectangle, rounded corners=1pt, draw=black!70, fill=#1, minimum height=4.2mm,
+             minimum width=11mm, inner sep=1.5pt, align=center},
+  fc/.default=blue!8,
+  op/.style={circle, draw=black!70, fill=white, minimum size=4mm, inner sep=0pt},
+  mod/.style={draw=black!55, dashed, rounded corners=2pt, inner sep=2.5pt},
+  lab/.style={font=\footnotesize\bfseries, anchor=west},
+  note/.style={font=\tiny, text=black!60},
+  every edge/.style={draw=black!70, ->},
+]
+%------------------------------------------------ (a) Sequential
+\begin{scope}[shift={(0,0)}]
+  \node[lab] at (-0.3,1.05) {(a) Sequential \normalfont\scriptsize(385 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc] (h) at (1.25,0) {FC 128\\+R};
+  \node[fc] (o) at (2.65,0) {FC 1};
+  \node[io] (y) at (3.75,0) {$\hat y$};
+  \draw (x) edge (h) (h) edge (o) (o) edge (y);
+  \node[note] at (1.9,-0.62) {depth 2 $\cdot$ width 128};
+\end{scope}
+%------------------------------------------------ (b) Parallel
+\begin{scope}[shift={(5.9,0)}]
+  \node[lab] at (-0.3,1.05) {(b) Parallel \normalfont\scriptsize(385 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc=orange!10] (a) at (1.25,0.33) {FC 64+R};
+  \node[fc=orange!10] (b) at (1.25,-0.33) {FC 64+R};
+  \node[op] (c) at (2.35,0) {\tiny$\Vert$};
+  \node[fc=orange!10] (o) at (3.2,0) {FC 1};
+  \node[io] (y) at (4.15,0) {$\hat y$};
+  \draw (x) edge (a) (x) edge (b) (a) edge (c) (b) edge (c) (c) edge (o) (o) edge (y);
+  \node[note] at (2.0,-0.78) {two branches, concatenated};
+\end{scope}
+%------------------------------------------------ (c) Modular
+\begin{scope}[shift={(11.9,0)}]
+  \node[lab] at (-0.3,1.05) {(c) Modular \normalfont\scriptsize(385 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc=teal!10] (h) at (1.25,0) {FC 128\\+R};
+  \node[fc=teal!10] (o) at (2.5,0) {FC 1};
+  \node[io] (y) at (3.6,0) {$\hat y$};
+  \node[mod, fit=(h)(o), label={[note]below:self-contained module}] {};
+  \draw (x) edge (h) (h) edge (o) (o) edge (y);
+\end{scope}
+%------------------------------------------------ (d) H-A
+\begin{scope}[shift={(0,-2.5)}]
+  \node[lab] at (-0.3,1.05) {(d) H-A: Parallel of Sequentials \normalfont\scriptsize(385 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc=yellow!14] (a1) at (1.1,0.36) {FC 12+R};
+  \node[fc=yellow!14] (a2) at (2.45,0.36) {FC 12+R};
+  \node[fc=yellow!14] (b1) at (1.1,-0.36) {FC 12+R};
+  \node[fc=yellow!14] (b2) at (2.45,-0.36) {FC 12+R};
+  \node[op] (c) at (3.45,0) {\tiny$\Vert$};
+  \node[fc=yellow!14, minimum width=8mm] (o) at (4.2,0) {FC 1};
+  \node[io] (y) at (5.0,0) {$\hat y$};
+  \draw (x) edge (a1) (a1) edge (a2) (x) edge (b1) (b1) edge (b2)
+        (a2) edge (c) (b2) edge (c) (c) edge (o) (o) edge (y);
+  \node[note] at (2.2,-0.8) {two 2-layer branches (depth + breadth)};
+\end{scope}
+%------------------------------------------------ (e) H-B
+\begin{scope}[shift={(6.0,-2.5)}]
+  \node[lab] at (-0.3,1.05) {(e) H-B: Staged Modular Chain \normalfont\scriptsize(385 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc=magenta!8, minimum width=8mm] (A) at (0.95,0) {$M_A$};
+  \node[fc=magenta!8, minimum width=8mm] (B) at (2.05,0) {$M_B$};
+  \node[fc=magenta!8, minimum width=8mm] (C) at (3.15,0) {$M_C$};
+  \node[op] (s) at (4.2,0) {\tiny$+$};
+  \node[io] (y) at (4.9,0) {$\hat y$};
+  \draw (x) edge (A) (A) edge (B) (B) edge (C) (C) edge (s) (s) edge (y);
+  % outputs a, b also feed later stages and the sum (top); x skips to B and C (bottom)
+  \draw[->, black!50] (A.north) to[out=35, in=145, looseness=0.9] (C.north);
+  \draw[->, black!50] (A.north east) to[out=30, in=150, looseness=0.8] (s.north);
+  \draw[->, black!50] (B.north east) to[out=35, in=150, looseness=0.9] (s.north west);
+  \draw[->, black!50] (x.south) to[out=-35, in=-145, looseness=0.9] (B.south);
+  \draw[->, black!50] (x.south east) to[out=-30, in=-150, looseness=0.8] (C.south);
+  \node[note] at (2.4,-1.05) {$M_{A,B,C}$: FC 33/32/31+R$\rightarrow$FC 1;\; $\hat y = a+b+c$};
+\end{scope}
+%------------------------------------------------ (f) H-C
+\begin{scope}[shift={(12.15,-2.5)}]
+  \node[lab] at (-0.3,1.05) {(f) H-C: Trunk + Heads \normalfont\scriptsize(387 p)};
+  \node[io] (x) at (0,0) {$x$};
+  \node[fc=green!10] (t1) at (1.05,0) {FC 20+R};
+  \node[fc=green!10] (t2) at (2.4,0) {FC 15+R};
+  \node[fc=green!10, minimum width=7mm] (h1) at (3.5,0.36) {FC 1};
+  \node[fc=green!10, minimum width=7mm] (h2) at (3.5,-0.36) {FC 1};
+  \node[op] (m) at (4.3,0) {\tiny$\mu$};
+  \node[io] (y) at (4.95,0) {$\hat y$};
+  \node[mod, fit=(t1)(t2), label={[note]below:shared trunk}] {};
+  \draw (x) edge (t1) (t1) edge (t2) (t2) edge (h1) (t2) edge (h2) (h1) edge (m) (h2) edge (m) (m) edge (y);
+\end{scope}
+\end{tikzpicture}
+\caption{The six parameter-matched architectures (385 trainable parameters; 387 for \HC). Top row: the three
+single-paradigm baselines from the pilot study. Bottom row: hybrids combining depth, breadth, and modularity.
+FC~$n$ = fully connected layer with $n$ outputs, R = ReLU, $\Vert$ = concatenation, $\mu$ = mean.
+Note that (a) and (c) compute the same function class; they differ only in how the code is organized,
+which lets us use them as a control pair for implementation overhead (Section~\ref{sec:pilot}).}
+\label{fig:arch}
+\end{figure*}

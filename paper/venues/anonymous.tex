@@ -1,0 +1,9 @@
+% Generic double-blind build (e.g., SVCC used double-blind in 2025). Fill in the submission number.
+% Also: remove the repository URL in sections/03_method.tex or swap it for an anonymous.4open.science link.
+\newif\ifcompact  % true = 6-page build (drops 3 secondary figures)
+\compactfalse
+\newif\ifanonymous
+\anonymoustrue
+\newcommand{\submissionid}{000}
+\newcommand{\venuenotice}{}
+\AtBeginDocument{\hypersetup{pdfauthor={},pdfcreator={},pdfproducer={}}}

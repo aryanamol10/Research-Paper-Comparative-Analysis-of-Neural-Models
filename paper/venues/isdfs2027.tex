@@ -1,0 +1,14 @@
+% IEEE ISDFS 2027 -- Int. Symp. on Digital Forensics and Security (San Jose State University; in person + online)
+% Full paper Jan 31, 2027 via Microsoft CMT. Max 6 pages, IEEE two-column 10pt. SINGLE-blind: names required.
+% Frame for this venue: emphasize on-device / edge latency (e.g., lightweight anomaly-detection models).
+% Camera-ready: PDF eXpress conference ID 73487X.
+\newif\ifcompact  % true = 6-page build (drops 3 secondary figures)
+\compacttrue
+\newif\ifanonymous
+\anonymousfalse
+\newcommand{\submissionid}{000}
+\newcommand{\venuenotice}{}
+% Camera-ready only (copyright line published by ISDFS for 2027):
+% \IEEEpubid{\makebox[\columnwidth]{979-8-3195-4011-9/27/\$31.00~\copyright2027 IEEE}\hspace{\columnsep}\makebox[\columnwidth]{ }}
+% 6-page fit: slightly tighter space between floats and text (layout only, no wording changes)
+\AtBeginDocument{\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}\setlength{\dbltextfloatsep}{10pt plus 2pt minus 2pt}}

@@ -1,0 +1,90 @@
+%% IEEE ISEC 2027 -- K-12 poster extended abstract (max 2 pages, due Jan 31, 2027 via EDAS).
+%% ISEC provides its own K-12 poster template: before uploading, copy this text into it
+%% (https://ewh.ieee.org/conf/stem/author.html). This IEEEtran build is for drafting.
+%% Compile this file instead of main.tex (Overleaf: Menu -> Main document).
+\documentclass[conference]{IEEEtran}
+\usepackage{cite,amsmath,graphicx,booktabs,xspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\graphicspath{{figures/}}
+\input{tables/numbers}
+\DeclareRobustCommand{\HB}{H\nobreakdash-B\xspace}
+
+\begin{document}
+\title{What a Student Benchmark Taught Me About Measuring Neural Network Speed}
+\author{\IEEEauthorblockN{Aryan Kulkarni}
+\IEEEauthorblockA{\textit{Bellarmine College Preparatory}, San Jose, CA, USA\\ aryanamol10@gmail.com}}
+\maketitle
+
+\begin{abstract}
+As a high-school researcher, I compared sequential, parallel, modular, and hybrid neural networks on three
+synthetic regression tasks. My first benchmark suggested that modular networks train
+\pilotSpeedup$\times$ faster. An audit showed that this came from mixing two software frameworks and from
+inputs that carried no information. A corrected, parameter-matched study with five random seeds found that how
+parameters are wired changes inference latency far more than parameter count does, and that a modular
+design matched to the problem's structure gave the best accuracy on the hardest task. I describe the project as
+a case study in experimental rigor for pre-college computing research.
+\end{abstract}
+
+\section{Motivation}
+Neural networks are often compared by parameter count, but users experience \emph{latency}. I asked:
+with the same parameter budget, does arranging the parameters in sequence, in parallel, or as modules
+change speed and accuracy?
+
+\section{From a Flawed Pilot to a Fair Test}
+The pilot used Keras for two models and PyTorch for the third. The ``fast'' modular model was mathematically
+identical to the sequential one, so the speedup was the framework's, not the architecture's. Its training inputs
+were also random numbers unrelated to the targets, so every model ended up predicting the average. The lesson
+I took away was to change one variable at a time, hold out test data, repeat with several seeds, and include a
+control that \emph{should} show no difference.
+
+\section{Main Study}
+Six models (about 385 parameters each) were trained in PyTorch on linear, curved, and chained functions,
+with five seeds each. A latency sweep timed every model at batch sizes from 1 to 4096.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig_ops_latency}
+\caption{Single-sample latency grows with the number of operations per call ($R^2=\opsFitRsq$), even though
+every model has about the same number of parameters.}
+\end{figure}
+
+\section{Findings}
+\begin{itemize}
+\item On the chained task, the staged modular hybrid (\HB) reached test MSE \mseChainHB, compared with
+\mseChainSequential\ for the plain sequential network.
+\item \HB was also the slowest model at batch size 1 (\latOneHB\,\textmu s vs.\ \latOneSequential\,\textmu s),
+because it runs the most operations per call.
+\item Parameter count alone predicted neither speed nor accuracy.
+\end{itemize}
+
+\section{Reflection for STEM Education}
+% ---------------------------------------------------------------------------------------------
+% BLUEPRINT -- rewrite every sentence in your own voice. Judges value honesty and specifics.
+% Aim for 4 short paragraphs (~200 words total). Fill in or delete each [bracketed] part.
+%  1. The surprise:   the moment you realized the pilot result was wrong, and how it felt.
+%  2. The lesson:     what "a fair comparison" means to you now (one variable at a time, controls).
+%  3. The process:    one concrete skill you learned (seeds, held-out data, reading PyTorch docs...).
+%  4. For others:     one piece of advice for a student starting their first ML project.
+% ---------------------------------------------------------------------------------------------
+\textbf{The surprise.} My first benchmark seemed to show that modular networks were
+\pilotSpeedup$\times$ faster, and I [was ready to write it up / believed it at first]. The moment
+I realized it was wrong was [describe it: e.g., noticing the ``fast'' model was mathematically
+identical to the slow one]. [How did that feel, and what did you do next?]
+
+\textbf{The lesson.} I learned that a fair comparison changes only one thing at a time. Mixing
+two software frameworks meant I was measuring the frameworks, not the architectures. Now I
+[plan a control that should show no difference / write down what I expect before running].
+
+\textbf{The process.} The hardest new skill was [e.g., running five random seeds and reporting the
+spread / holding out test data / reading the PyTorch source]. It mattered because [one sentence].
+
+\textbf{For other students.} If I could tell another student one thing, it would be: [your advice].
+Projects like this need no special hardware; every model here trains on a laptop.
+
+\section*{Acknowledgment}
+The pilot study used Google Colab. AI tools assisted with experiment code, figures, and drafting; the author
+verified all content.
+
+\end{document}

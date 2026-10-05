@@ -1,0 +1,82 @@
+%% ============================================================================
+%% Depth, Breadth, or Modularity? -- IEEE conference paper (IEEEtran, two-column)
+%% Overleaf: set the compiler to pdfLaTeX (Menu -> Compiler). Main document: main.tex
+%%
+%% Venue switches live in venue.tex (page limit, blind review, footer notice).
+%% Copy a file from venues/ over venue.tex to retarget the paper.
+%% ============================================================================
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts  % lets \thanks / copyright notice work
+
+\input{venue}
+
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\usepackage{xspace}
+
+\graphicspath{{figures/}}
+\input{tables/numbers}  % auto-generated result values (scripts/make_figures.py)
+
+% ---- notation -----------------------------------------------------------------
+\DeclareRobustCommand{\HA}{H\nobreakdash-A\xspace}
+\DeclareRobustCommand{\HB}{H\nobreakdash-B\xspace}
+\DeclareRobustCommand{\HC}{H\nobreakdash-C\xspace}
+% \tablebody: raw \input that is safe inside tabular (plain \input breaks \bottomrule)
+\makeatletter\newcommand{\tablebody}[1]{\@@input #1 }\makeatother
+\newcommand{\ms}{\,ms\xspace}
+\newcommand{\us}{\,\textmu s\xspace}
+% Editing notes: \todo{...} renders in red. Turn off with \renewcommand{\todo}[1]{} before submitting.
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{\sc e}\kern-.125em X}}
+
+\begin{document}
+
+\title{Depth, Breadth, or Modularity? A Parameter-Matched Benchmark of Hybrid Neural Architectures for
+Inference Latency and Accuracy}
+
+\ifanonymous
+\author{\IEEEauthorblockN{Anonymous Author(s)}
+\IEEEauthorblockA{Submission \#\submissionid\ -- withheld for double-blind review}}
+\else
+\author{\IEEEauthorblockN{Aryan Kulkarni}
+\IEEEauthorblockA{\textit{Bellarmine College Preparatory}\\
+San Jose, CA, USA\\
+aryanamol10@gmail.com}
+}
+\fi
+
+\maketitle
+\venuenotice
+
+\input{sections/00_abstract}
+\input{sections/01_introduction}
+\ifcompact\input{sections/02_related_short}\else\input{sections/02_related}\fi
+\input{sections/03_method}
+\input{sections/04_pilot}
+\input{sections/05_results}
+\input{sections/06_discussion}
+\input{sections/07_conclusion}
+
+% Contains no identifying information, so it is kept in the double-blind build as well.
+\section*{Acknowledgment}
+The pilot study used Google Colab. AI tools assisted with experiment code, figures, and drafting;
+\ifanonymous the authors\else the author\fi\ verified all content.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

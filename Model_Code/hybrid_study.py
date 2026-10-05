@@ -8,7 +8,8 @@ Fixes from Benchmark 1:
   - 80/20 train/test split, metrics reported on held-out test data
   - 5 seeds per (model, task), reported as mean +/- std
 
-Every model is kept at ~385 trainable parameters, the same budget as Benchmark 1.
+Every model is kept at 385 trainable parameters (H-C: 387, the closest its wiring allows),
+the same budget as Benchmark 1.
 """
 
 import json
@@ -99,11 +100,11 @@ class ParallelOfSequentials(nn.Module):
 class StagedModularChain(nn.Module):
     """H-B: one module per stage of the chained equation, with skip links from x.
     A sees x; B sees (x, a); C sees (x, a, b); output = a + b + c."""
-    def __init__(self, h=32):
+    def __init__(self, widths=(33, 32, 31)):  # widths chosen so the total is exactly 385
         super().__init__()
-        self.module_a = mlp(1, h)
-        self.module_b = mlp(2, h)
-        self.module_c = mlp(3, h)
+        self.module_a = mlp(1, widths[0])
+        self.module_b = mlp(2, widths[1])
+        self.module_c = mlp(3, widths[2])
 
     def forward(self, x):
         a = self.module_a(x)
@@ -114,11 +115,11 @@ class StagedModularChain(nn.Module):
 
 class TrunkParallelHeads(nn.Module):
     """H-C: shared sequential trunk, then two parallel heads averaged."""
-    def __init__(self, h=17):
+    def __init__(self, h1=20, h2=15):  # no two-head width pair gives exactly 385; 20/15 gives 387
         super().__init__()
-        self.trunk = nn.Sequential(nn.Linear(1, h), nn.ReLU(), nn.Linear(h, h), nn.ReLU())
-        self.head_1 = nn.Linear(h, 1)
-        self.head_2 = nn.Linear(h, 1)
+        self.trunk = nn.Sequential(nn.Linear(1, h1), nn.ReLU(), nn.Linear(h1, h2), nn.ReLU())
+        self.head_1 = nn.Linear(h2, 1)
+        self.head_2 = nn.Linear(h2, 1)
 
     def forward(self, x):
         z = self.trunk(x)
