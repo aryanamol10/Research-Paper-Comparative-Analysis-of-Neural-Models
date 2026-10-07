@@ -1,8 +1,8 @@
 \section{Results}
 \label{sec:results}
 
-\Cref{tab:main} reports accuracy and cost for every (model, task) pair, \cref{fig:curves} shows test-error
-trajectories\ifcompact.\else, and \cref{fig:long} extends the chained task to 300 epochs. \fi The latency sweep is shown in
+\Cref{tab:main} reports accuracy and cost for every (model, task) pair, and \cref{fig:long} follows the chained
+task to 300 epochs. The latency sweep is shown in
 \cref{fig:latency,fig:ops}.
 
 \begin{table*}[t]
@@ -21,14 +21,6 @@ $^\dagger$Welch's $t$-test vs.\ Sequential, $p<0.05$. Inference = forward pass o
 \bottomrule
 \end{tabular}
 \end{table*}
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_curves}
-\caption{Test MSE per epoch (log scale, mean of five seeds). With standardized targets every model converges within
-10 epochs on the simple tasks; on the chained task \HB (pink) ends lowest.}
-\label{fig:curves}
-\end{figure*}
 
 \subsection{The Control Pair: Identical Math, Different Code}
 \label{sec:res-control}
@@ -64,11 +56,11 @@ than Sequential's (\chainExcessSeq). \HA, which has no knowledge of the stages, 
 (\mseChainHA), and plain breadth does not help: Parallel is the worst model (\mseChainParallel).
 
 \ifcompact
-\textbf{Undertraining or a ceiling?} Trained for 300 epochs, every model improves (Sequential to \longSeqThree), but
+\textbf{Undertraining or a ceiling?} Trained for 300 epochs (\cref{fig:long}), every model improves (Sequential to \longSeqThree), but
 \HB still ends \longHBGain\% lower (\longHBThree; $p=\longHBpval$), so the gap is not an artifact of the 100-epoch budget.
 \else
 \textbf{Undertraining or a ceiling?} At 100 epochs the chained-task models are still improving, so we trained
-Sequential, Parallel, \HA, and \HB for 300 epochs\ifcompact\else\ (\cref{fig:long})\fi. Every model improves:
+Sequential, Parallel, \HA, and \HB for 300 epochs (\cref{fig:long}). Every model improves:
 Sequential falls \longSeqDrop\% to \longSeqThree, and Parallel (\longParThree) catches up with it. The \HB advantage
 persists: it ends at \longHBThree, \longHBGain\% below Sequential ($p=\longHBpval$), with \longExcessRatio$\times$
 smaller excess error. Gains level off late (the last 1\% improvement comes after epoch \longHBPlateau\ for \HB and
@@ -76,7 +68,6 @@ smaller excess error. Gains level off late (the last 1\% improvement comes after
 gap is not an artifact of the 100-epoch training budget.
 \fi
 
-\ifcompact\else  % dropped in the 6-page build
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig_long}
@@ -84,7 +75,6 @@ gap is not an artifact of the 100-epoch training budget.
 of the main study. \HB stays lowest throughout; Parallel catches up with Sequential.}
 \label{fig:long}
 \end{figure}
-\fi
 
 \subsection{Latency: Operator Count, Not Parameter Count}
 \label{sec:res-latency}

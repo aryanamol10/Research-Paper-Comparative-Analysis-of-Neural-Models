@@ -34,7 +34,7 @@ sinusoid with $\sigma=2$; (c)~a three-stage composition containing a square-wave
 \subsection{Architectures}
 \label{sec:archs}
 All six models (\cref{fig:arch}) are one-input, one-output multilayer models with ReLU
-activations~\cite{nair2010rectified}, each with exactly 385 trainable parameters, so that differences in accuracy
+activations, each with exactly 385 trainable parameters, so that differences in accuracy
 or speed cannot be attributed to capacity. The one exception is \HC: no width pair for two-head wiring totals
 385, so it uses the nearest configuration, 387 (+0.5\%). \Cref{tab:arch} lists their parameter counts,
 multiply--accumulate operations (MACs) per sample, critical-path depth (linear layers between input and

@@ -20,8 +20,13 @@ batched inference, that trade can be worthwhile; for per-sample real-time loops 
 4096 (memory-bound) differ. A benchmark at one batch size can recommend the incorrect model for another.
 \end{enumerate}
 
-\ifcompact\else  % dropped in the 6-page build (summarized in Section V-B)
 \subsection{Target Scaling Can Masquerade as Architecture}
+\ifcompact
+On unscaled targets (an earlier version of this study), the hybrids converged far faster and \HB appeared
+43\% better than Sequential on the chained task. Standardizing the targets removed most of the convergence gap
+and shrank the advantage to \chainHBGain\%: like the pilot's framework confound, a protocol choice produced an
+apparent architecture effect.
+\else
 An earlier version of this study trained on unscaled targets, whose variance reaches 229 on the curved task. There,
 the single-paradigm models converged far more slowly than the hybrids (69 vs.\ 8 epochs on the curved task), and
 \HB appeared 43\% better than Sequential on the chained task. Standardizing the targets removed nearly all of the
