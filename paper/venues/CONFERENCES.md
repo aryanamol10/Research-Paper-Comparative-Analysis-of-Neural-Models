@@ -1,4 +1,10 @@
-# Target IEEE conferences (researched 2026-10-01)
+# Target IEEE conferences (researched 2026-10-01, updated 2026-10-07)
+
+> **Current plan (Oct 7):** submit to **IEEE ICMLANT 2026 by Oct 12** (online, 6 pages, double-blind;
+> Overleaf project "Hybrid Archs – ICMLANT 2026", build `venues/icmlant2026.tex`). Decision Nov 13; register by
+> Nov 20 if accepted. If rejected: **ICMI (Dec 15)**, then **ISDFS (Jan 31)**. ISQED is dropped because its
+> Oct 25 deadline falls while ICMLANT is reviewing the paper. Live timeline:
+> https://claude.ai/code/artifact/56954d19-17fc-426c-b1b7-14eef6e33599
 
 Shortlist of IEEE Xplore venues that are **in the Bay Area or allow hybrid/remote presentation** and whose deadlines
 haven't passed. Details marked *verify* came from a previous edition or an inconsistent website, so check them before
@@ -8,6 +14,7 @@ you submit. Every venue requires at least one author to **register and present**
 
 | # | Venue | Dates | Where | Deadline | Pages | Review | System | Build |
 |---|---|---|---|---|---|---|---|---|
+| ★ | **IEEE ICMLANT 2026** – ML & Applied Network Technologies ([icmlant.com](https://icmlant.com/)) | Dec 10–11, 2026 | Online (Don Bosco Univ., El Salvador) | **Oct 12, 2026** | ≤ 6 | **double-blind** | see site | `icmlant2026` (6 pp, anonymous) |
 | 1 | **IEEE ICMI 2027** – Computing & Machine Intelligence | Apr 24–25, 2027 | Mt. Pleasant, MI · **hybrid** (present online) | **Dec 15, 2026** | 5 std, 6 max (+$25) | not stated (*verify*) | CMT | `icmi2027` (6 pp) |
 | 2 | **ISQED 2027** – Quality Electronic Design | Apr 14–16, 2027 | **San Francisco** · hybrid | **Oct 25, 2026** (extended, *verify*) | 4–8 (aim 6–8) | **double-blind** | START/Softconf | `isqed2027` (8 pp, anonymous) |
 | 3 | **IEEE ISDFS 2027** – Digital Forensics & Security | Mar 25–26, 2027 | **San Jose State** · in person + online | **Jan 31, 2027** | ≤ 6 | single-blind | CMT | `isdfs2027` (6 pp) |
