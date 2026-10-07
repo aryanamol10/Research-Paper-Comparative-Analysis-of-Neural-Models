@@ -60,9 +60,9 @@ other two to vary, and that difference is what lets us test which cost measure a
 
 \begin{table}[t]
 \centering
-\caption{Architecture cost profile. Depth = linear layers on the longest input--output path. Ops = PyTorch
-tensor operations dispatched per forward call; Kern.\ = ATen kernels executed. Latency = median
-single-thread CPU inference time over 10 shuffled repeats; comp.\ = after \texttt{torch.compile}.}
+\caption{Architecture cost profile. Depth: linear layers on the longest path. Ops / Kern.: PyTorch operations /
+ATen kernels per forward call. Latency: median single-thread CPU time over 10 shuffled repeats; comp.: with
+\texttt{torch.compile}.}
 \label{tab:arch}
 \setlength{\tabcolsep}{2.4pt}
 \begin{tabular}{@{}lrrrrrrrr@{}}
