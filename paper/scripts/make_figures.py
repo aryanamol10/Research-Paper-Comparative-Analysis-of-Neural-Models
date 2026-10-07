@@ -1,8 +1,10 @@
 """
 Builds every figure and results table in the paper from the raw experiment outputs.
 
-Inputs  (paper/results/): hybrid_results.json  (Model_Code/hybrid_study.py)
-                          latency_results.json (Model_Code/latency_sweep.py)
+Inputs  (paper/results/): hybrid_results.json          (Model_Code/hybrid_study.py)
+                          latency_results.json         (Model_Code/latency_sweep.py)
+                          long_training_results.json   (Model_Code/long_training.py)
+                          compile_latency_results.json (Model_Code/compile_latency.py)
 Outputs (paper/figures/, paper/tables/): PDF figures and LaTeX table bodies.
 
 Run from the paper/ directory:  python scripts/make_figures.py
@@ -146,7 +148,7 @@ def fig_latency_batch(latency):
     save(fig, "fig_latency_batch")
 
     #single-column, single-thread variant for the 6-page build
-    fig, ax = plt.subplots(figsize=(COL_W, 1.95))  # compact-only figure; kept short for the 6-page fit
+    fig, ax = plt.subplots(figsize=(COL_W, 1.8))  # compact-only figure; kept short for the 6-page fit
     for m in MODELS:
         med = [lat[m]["timings"][f"1|{b}"]["median_us"] for b in batches]
         ax.plot(batches, med, color=COLOR[m], linestyle=DASH[m], marker=MARKER[m], markersize=3.5, label=SHORT[m])
@@ -165,7 +167,7 @@ def fig_ops_latency(latency):
     ops = np.array([lat[m]["ops_per_call"] for m in MODELS])
     us = np.array([lat[m]["timings"]["1|1"]["median_us"] for m in MODELS])
     fit = stats.linregress(ops, us)
-    fig, ax = plt.subplots(figsize=(COL_W, 2.2))
+    fig, ax = plt.subplots(figsize=(COL_W, 2.0))
     xs = np.linspace(ops.min() - 1, ops.max() + 1, 50)
     ax.plot(xs, fit.intercept + fit.slope * xs, color=MUTED, linewidth=0.9, linestyle="--", zorder=1,
             label=f"OLS fit ($R^2$ = {fit.rvalue**2:.2f})")
@@ -203,6 +205,30 @@ def fig_pilot():
     ax.legend(loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.2), fontsize=6.3,
               columnspacing=0.8, handlelength=1.4)
     save(fig, "fig_pilot")
+
+
+LONG_MODELS = ["Sequential", "Parallel", "H-A Parallel of Sequentials", "H-B Staged Modular Chain"]
+
+
+def fig_long(long):
+    """Chained task trained to 300 epochs: is the 100-epoch gap undertraining or a ceiling?"""
+    fig, ax = plt.subplots(figsize=(COL_W, 2.15))
+    start = 10  # skip the first epochs so the region that decides the question is legible
+    for m in LONG_MODELS:
+        h = np.array(long[m]["history_mean"])
+        ep = np.arange(1, len(h) + 1)
+        ax.plot(ep[start - 1:], h[start - 1:], color=COLOR[m], linestyle=DASH[m], marker=MARKER[m],
+                markevery=30, markersize=3.5, label=SHORT[m])
+    ax.axhline(0.25, color=MUTED, linewidth=0.8, linestyle=":")
+    ax.text(start + 2, 0.255, "noise floor (0.25)", fontsize=6.5, color=MUTED, va="bottom")
+    ax.axvline(100, color=MUTED, linewidth=0.8, linestyle="--")
+    ax.text(104, 0.258, "main-study budget", fontsize=6.5, color=MUTED, va="bottom")
+    ax.set_xlim(start, 300)
+    ax.set_ylim(0.24, 0.6)
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Chained-task test MSE")
+    ax.legend(ncol=2, frameon=False, fontsize=6.5, loc="upper right")
+    save(fig, "fig_long")
 
 
 def fmt(mean_sd, digits=3):
@@ -243,7 +269,7 @@ def table_main(hybrid):
     (TAB / "tab_main_body.tex").write_text("\n".join(lines) + "\n")
 
 
-def table_arch(latency):
+def table_arch(latency, compiled):
     depth = {"Sequential": 2, "Parallel": 2, "Modular": 2, "H-A Parallel of Sequentials": 3,
              "H-B Staged Modular Chain": 6, "H-C Trunk + Parallel Heads": 3}
     lines = []
@@ -251,7 +277,8 @@ def table_arch(latency):
         e = latency["models"][m]
         lines.append(f"{SHORT[m]} & {e['params']} & {e['macs_per_sample']} & {depth[m]} & {e['ops_per_call']}"
                      f" & {e['kernels_per_call']}"
-                     f" & {e['timings']['1|1']['median_us']:.1f} & {e['timings']['1|4096']['median_us']:.0f}\\\\")
+                     f" & {e['timings']['1|1']['median_us']:.1f} & {compiled['models'][m]['median_us']:.1f}"
+                     f" & {e['timings']['1|4096']['median_us']:.0f}\\\\")
     (TAB / "tab_arch_body.tex").write_text("\n".join(lines) + "\n")
 
 
@@ -264,7 +291,7 @@ def table_pilot():
     (TAB / "tab_pilot_body.tex").write_text("\n".join(lines) + "\n")
 
 
-def macros(hybrid, latency, fit):
+def macros(hybrid, latency, fit, long, compiled):
     """Numbers quoted in the prose, so the text can never drift from the results."""
     lat = latency["models"]
     out = {}
@@ -337,6 +364,42 @@ def macros(hybrid, latency, fit):
         out[f"mod{SHORT[m].replace('-', '')}"] = str(c)
     out["ctrlLatGap"] = f"{100 * abs(t1(seq, 1) - t1('Modular', 1)) / t1('Modular', 1):.0f}"
     out["ctrlStepGap"] = f"{100 * abs(get(hybrid, 'Linear', seq, 'ms_per_step')[0] - get(hybrid, 'Linear', 'Modular', 'ms_per_step')[0]) / get(hybrid, 'Linear', 'Modular', 'ms_per_step')[0]:.0f}"
+    #Long training (chained task, 300 epochs)
+    seqL, parL, haL, hbL = (long[m] for m in LONG_MODELS)
+    out["longSeqHundred"] = f"{seqL['mse_100'][0]:.3f}"
+    out["longSeqThree"] = f"{seqL['mse_300'][0]:.3f}"
+    out["longParThree"] = f"{parL['mse_300'][0]:.3f}"
+    out["longHAThree"] = f"{haL['mse_300'][0]:.3f}"
+    out["longHBThree"] = f"{hbL['mse_300'][0]:.3f}"
+    out["longHBGain"] = f"{100 * (1 - hbL['mse_300'][0] / seqL['mse_300'][0]):.0f}"
+    out["longHAGain"] = f"{100 * (1 - haL['mse_300'][0] / seqL['mse_300'][0]):.0f}"
+    out["longSeqDrop"] = f"{100 * (1 - seqL['mse_300'][0] / seqL['mse_100'][0]):.0f}"
+    out["longSeqPlateau"] = f"{seqL['plateau_epoch'][0]:.0f}"
+    out["longHBPlateau"] = f"{hbL['plateau_epoch'][0]:.0f}"
+    out["longSeqExcess"] = f"{seqL['mse_300'][0] - 0.25:.3f}"
+    out["longHBExcess"] = f"{hbL['mse_300'][0] - 0.25:.3f}"
+    out["longExcessRatio"] = f"{(seqL['mse_300'][0] - 0.25) / (hbL['mse_300'][0] - 0.25):.1f}"
+    p_long = stats.ttest_ind_from_stats(hbL["mse_300"][0], hbL["mse_300"][1] * np.sqrt(N_SEEDS / (N_SEEDS - 1)), N_SEEDS,
+                                        seqL["mse_300"][0], seqL["mse_300"][1] * np.sqrt(N_SEEDS / (N_SEEDS - 1)), N_SEEDS,
+                                        equal_var=False).pvalue
+    out["longHBpval"] = f"{p_long:.3f}" if p_long >= 0.001 else "0.001"
+    out["longHBsig"] = "p<0.05" if p_long < 0.05 else "n.s."
+
+    #torch.compile batch-1 latency
+    comp = np.array([compiled["models"][m]["median_us"] for m in MODELS])
+    for m in MODELS:
+        out[f"comp{SHORT[m].replace('-', '')}"] = f"{compiled['models'][m]['median_us']:.1f}"
+    cfit = stats.linregress(ops_arr, comp)
+    out["compFitRsq"] = f"{cfit.rvalue ** 2:.2f}"
+    out["compFitSlope"] = f"{cfit.slope:.2f}"
+    out["compSpread"] = f"{comp.max() / comp.min():.1f}"
+    eager_spread = y1.max() / y1.min()
+    out["eagerSpread"] = f"{eager_spread:.1f}"
+    out["compRatioHB"] = f"{compiled['models'][hb]['median_us'] / compiled['models'][seq]['median_us']:.1f}"
+    speedups = y1 / comp
+    out["compSpeedupMin"] = f"{speedups.min():.1f}"
+    out["compSpeedupMax"] = f"{speedups.max():.1f}"
+
     body = "\n".join(f"\\newcommand{{\\{k}}}{{{v}}}" for k, v in sorted(out.items()))
     (TAB / "numbers.tex").write_text("% Auto-generated by scripts/make_figures.py. Do not edit.\n" + body + "\n")
 
@@ -345,16 +408,19 @@ def main():
     FIG.mkdir(exist_ok=True)
     TAB.mkdir(exist_ok=True)
     hybrid, latency = load()
+    long = json.loads((RES / "long_training_results.json").read_text())
+    compiled = json.loads((RES / "compile_latency_results.json").read_text())
     fig_tasks()
     fig_curves(hybrid)
     fig_tradeoff(hybrid)
     fig_latency_batch(latency)
     fit = fig_ops_latency(latency)
     fig_pilot()
+    fig_long(long)
     table_main(hybrid)
-    table_arch(latency)
+    table_arch(latency, compiled)
     table_pilot()
-    macros(hybrid, latency, fit)
+    macros(hybrid, latency, fit, long, compiled)
     print("figures and tables written")
 
 

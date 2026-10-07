@@ -3,7 +3,7 @@
 \label{sec:related}
 
 \textbf{Depth, breadth, and modularity.} Shallow networks are universal
-estimators~\cite{cybenko1989approximation}, yet depth can be exponentially more
+approximators~\cite{cybenko1989approximation}, yet depth can be exponentially more
 efficient~\cite{eldan2016power,telgarsky2016benefits}. Multi-branch blocks~\cite{szegedy2015going,xie2017resnext},
 shared trunks with task heads~\cite{caruana1997multitask}, and modular or expert
 networks~\cite{jacobs1991adaptive,shazeer2017outrageously,andreas2016neural,pfeiffer2023modular} combine these
@@ -12,8 +12,8 @@ connections~\cite{he2016resnet,huang2017densenet}.
 
 \textbf{Measuring efficiency.} Parameters and FLOPs are poor latency proxies and can reverse
 rankings~\cite{ma2018shufflenetv2,dehghani2022efficiency}, which is why hardware-aware search optimizes measured
-latency~\cite{tan2019mnasnet} and benchmarks such as MLPerf fix the calculation
-protocol~\cite{reddi2020mlperf,banbury2021mlperftiny}. Measurements are also fragile, where the framework choice changes
-speed~\cite{shi2016benchmarking}, and seed dynamics can exceed claimed effects~\cite{bouthillier2021accounting,lipton2019troubling}.
-Unlike prior latency studies of large models on accelerators, we hold parameters fixed and study under-kilobyte
-MLPs on one CPU thread, where operator elevation is visible in isolation.
+latency~\cite{tan2019mnasnet} and benchmarks such as MLPerf fix the measurement
+protocol~\cite{reddi2020mlperf,banbury2021mlperftiny}. Measurements are also fragile: framework choice changes
+speed~\cite{shi2016benchmarking}, and seed variance can exceed claimed effects~\cite{bouthillier2021accounting,lipton2019troubling}.
+Unlike prior latency studies of large models on accelerators, we hold parameters fixed and study sub-kilobyte
+MLPs on one CPU thread, where operator overhead is visible in isolation.

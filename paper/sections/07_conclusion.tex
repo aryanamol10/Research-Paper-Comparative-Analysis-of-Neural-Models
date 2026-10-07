@@ -1,15 +1,15 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We benchmarked six neural architectures that share a $\approx$385-parameter budget and differ only in how
-those parameters are arranged. Three findings stand out. First, configuration changes final accuracy only when the
-target has structure for it to match. A staged modular hybrid reduced error on a compositional task by
-\chainHBGain\%, while every other structure tied on simple tasks. Second, hybrids complete in far fewer epochs, which can
-offset their higher cost given per step. Third, small-model latency is decided by operator count at small batch sizes and
-by activation width at large ones, and parameter count predicts neither. A pilot study that reached the opposite
-conclusion through a framework perplexities shows why these comparisons need null controls and single
-software stacks.
+We benchmarked six neural architectures that share a 385-parameter budget and differ only in how those parameters
+are arranged. Three findings stand out. First, configuration changes final accuracy only when the target has
+structure for it to match. A staged modular hybrid reduced error on a compositional task by \chainHBGain\%, a gap that
+held after 300 epochs, while every other structure tied on simple tasks. Second, small-model latency is decided by
+operator count at small batch sizes and by activation width at large ones, and parameter count predicts neither;
+\texttt{torch.compile} narrows the operator-count penalty but adds a fixed per-call cost. Third, protocol choices can
+masquerade as architecture effects: a cross-framework confound in our pilot and unscaled targets in an earlier run
+both produced large apparent advantages that disappeared under a controlled protocol.
 
-Future work will extend the study to compiled runtimes (\texttt{torch.compile}, ONNX Runtime) that combine small
-operators, to microcontroller and GPU targets, to bigger parameter budgets where arithmetic dominates overhead,
-and to real-world tasks where the stage partitioning must be learned rather than designed.
+Future work will extend the study to other runtimes (ONNX Runtime) and hardware (GPUs, neural accelerators,
+microcontrollers), to larger parameter budgets where arithmetic dominates overhead, and to real-world tasks where
+the stage decomposition must be learned rather than designed.

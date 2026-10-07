@@ -7,6 +7,8 @@ Fixes from Benchmark 1:
   - every model runs in one framework (PyTorch) with one training loop
   - 80/20 train/test split, metrics reported on held-out test data
   - 5 seeds per (model, task), reported as mean +/- std
+  - targets are standardized with the training set's mean and std; every reported MSE is
+    converted back to original units, so it still compares to the noise floors (1, 4, 0.25)
 
 Every model is kept at 385 trainable parameters (H-C: 387, the closest its wiring allows),
 the same budget as Benchmark 1.
@@ -136,7 +138,14 @@ MODELS = {
 }
 
 
-def run(model_cls, x_tr, y_tr, x_te, y_te, seed):
+def standardize(y_tr, y_te):
+    """Scale targets with training-set statistics only; returns the scale to undo it."""
+    mean, sd = y_tr.mean().item(), y_tr.std(unbiased=False).item()
+    return (y_tr - mean) / sd, (y_te - mean) / sd, sd
+
+
+def run(model_cls, x_tr, y_tr, x_te, y_te, seed, y_sd=1.0, epochs=EPOCHS):
+    """y_tr / y_te are standardized; y_sd converts MSE back to original units (MSE * sd^2)."""
     torch.manual_seed(seed)
     model = model_cls()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-7)
@@ -148,7 +157,7 @@ def run(model_cls, x_tr, y_tr, x_te, y_te, seed):
     history = []
     steps = 0
     start = time.perf_counter()
-    for _ in range(EPOCHS):
+    for _ in range(epochs):
         model.train()
         for bx, by in loader:
             optimizer.zero_grad()
@@ -158,7 +167,7 @@ def run(model_cls, x_tr, y_tr, x_te, y_te, seed):
             steps += 1
         model.eval()
         with torch.no_grad():
-            history.append(criterion(model(x_te), y_te).item())
+            history.append(criterion(model(x_te), y_te).item() * y_sd ** 2)
     train_time = time.perf_counter() - start
 
     #inference latency: predict the full 1,000-point test set, median of 50 calls
@@ -178,7 +187,7 @@ def run(model_cls, x_tr, y_tr, x_te, y_te, seed):
         "ms_per_step": 1000 * train_time / steps,
         "infer_ms": 1000 * float(np.median(timings)),
         "test_mse": test_mse,
-        "r2": 1 - test_mse / y_te.var(unbiased=False).item(),
+        "r2": 1 - test_mse / (y_te.var(unbiased=False).item() * y_sd ** 2),
         "converge_epoch": converge_epoch,
         "history": history,
     }
@@ -193,8 +202,9 @@ def main():
     results = {}
     for env, y in environments.items():
         y_tr, y_te = (torch.tensor(y[i], dtype=torch.float32) for i in (tr, te))
+        y_tr, y_te, y_sd = standardize(y_tr, y_te)
         for name, cls in MODELS.items():
-            runs = [run(cls, x_tr, y_tr, x_te, y_te, s) for s in SEEDS]
+            runs = [run(cls, x_tr, y_tr, x_te, y_te, s, y_sd) for s in SEEDS]
             summary = {k: (float(np.mean([r[k] for r in runs])), float(np.std([r[k] for r in runs])))
                        for k in ("time_s", "ms_per_step", "infer_ms", "test_mse", "r2", "converge_epoch")}
             summary["params"] = runs[0]["params"]

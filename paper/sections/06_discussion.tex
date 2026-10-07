@@ -7,55 +7,69 @@ The results support a simple decision rule for small models on latency-sensitive
 \item \emph{If the target has no known structure, keep it shallow and minimize operators.} On the linear and
 curved tasks every topology reached the noise floor, so the cheapest one, a single wide hidden layer with three
 operations, becomes the best choice. It trains fastest per step and has the lowest batch-1 latency.
+\ifcompact
+\item \emph{If the target is compositional and its stages are known, a staged modular hybrid can be worth its
+overhead:} \chainHBGain\% lower error at \latOneRatioHB$\times$ the batch-1 latency, attractive for batched inference only.
+\else
 \item \emph{If the target is compositional and its stages are known, a staged modular hybrid is worth its
 overhead.} \HB cut chained-task excess error by \chainExcessRatio$\times$ at \stepRatioHB$\times$ the training cost per
-step and \latOneRatioHB$\times$ the batch-1 latency. For offline or batched inference, that trade is
-attractive. For per-sample loops, this is not the case.
+step and \latOneRatioHB$\times$ the batch-1 latency, a modest accuracy gain (\chainHBGain\%) at a real cost. For offline or
+batched inference, that trade can be worthwhile; for per-sample real-time loops it usually is not.
+\fi
 \item \emph{Measure latency at the deployment batch size.} The ranking at batch 1 (operator-bound) and at batch
 4096 (memory-bound) differ. A benchmark at one batch size can recommend the incorrect model for another.
 \end{enumerate}
 
 \ifcompact\else  % dropped in the 6-page build (summarized in Section V-B)
-\subsection{Hybrids Converge Faster}
-A less expected result is how much faster the hybrids converge. \HB reached the curved-task noise floor in
-\curvedConvHB\ epochs, and \HA in 24, against \curvedConvSeq\ for single models. We hypothesize that the
-additive multi-path output acts like a remaining groupage ~\cite{he2016resnet,lakshminarayanan2017simple}, where several
-sub-networks fit different parts of the target at once, so no single narrow path is required to carry the whole
-function. When training compute rather than inference latency is the bottleneck, this can outweigh the hybrids'
-higher per-step cost.
+\subsection{Target Scaling Can Masquerade as Architecture}
+An earlier version of this study trained on unscaled targets, whose variance reaches 229 on the curved task. There,
+the single-paradigm models converged far more slowly than the hybrids (69 vs.\ 8 epochs on the curved task), and
+\HB appeared 43\% better than Sequential on the chained task. Standardizing the targets removed nearly all of the
+convergence gap and shrank the chained-task advantage to \chainHBGain\%. Much of the apparent hybrid benefit was
+therefore an optimization effect: the additive, multi-path hybrids coped better with badly scaled targets. This is a
+second example, after the pilot, of a protocol choice producing an apparent architecture effect.
 \fi
 
 \ifcompact\else  % dropped in the 6-page build (overlaps Section IV)
 \subsection{Lessons for Small-Scale Benchmarking}
 The pilot study shows how easily a benchmark can produce a confident, wrong
-conclusion. Three practices caught it and are cheap enough for any student or practitioner to conduct. First,
+conclusion. A few practices catch such errors and are cheap enough for any student or practitioner to adopt. First,
 include a \emph{null control}: a pair that should show no difference, such as our identical Sequential and
-Modular networks. Our benchmarking served multiple roles, exposing the pilot's framework confound, catching CPU contention during
-one training pass, and revealing module-call overhead that operation counts alone miss. Second, hold the framework and training loop fixed so that timing measures the model and not
-the software stack~\cite{shi2016benchmarking}. Third, check accuracy against small baselines. A model's output that gives
-the loss being equal to the target variance has not learned anything~\cite{lipton2019troubling}.
+Modular networks. Ours served several roles: it exposed the pilot's framework confound, flagged CPU contention during
+training, and revealed module-call overhead that operation counts alone miss. Second, hold the framework and training loop fixed so that timing measures the model and not
+the software stack~\cite{shi2016benchmarking}. Third, check accuracy against trivial baselines: a model whose loss equals the target variance
+has learned nothing~\cite{lipton2019troubling}. Fourth, standardize targets before comparing training dynamics, so that
+optimization difficulty is not mistaken for an architecture effect.
 \fi
 
 \subsection{Limitations and Threats to Validity}
-\textbf{Scale.} The models are tiny ($\approx$385 parameters) and the tasks shown for testing are one-dimensional. This is
-done deliberately, as it isolates the topology from overall capacity and makes the five-seed run cheap. It also means the
-total latencies are dominated by per-operator overhead in a way that will shrink, though not vanish, for larger
-models, where compute and traffic take over~\cite{sze2017efficient}. The ranking of architectures at
+\ifcompact
+\textbf{Scale.} The models are tiny and the tasks one-dimensional, by design: this isolates topology from capacity. Per-operator
+overhead will matter less for larger models, where compute and memory traffic dominate~\cite{sze2017efficient}.
+\else
+\textbf{Scale.} The models are tiny ($\approx$385 parameters) and the tasks are one-dimensional. This is
+deliberate, as it isolates the topology from overall capacity and makes the five-seed run cheap. It also means the
+absolute latencies are dominated by per-operator overhead in a way that will shrink, though not vanish, for larger
+models, where compute and memory traffic take over~\cite{sze2017efficient}. The ranking of architectures at
 batch~4096, where arithmetic begins to matter, is a better guide to larger-scale behavior than batch~1.
+\fi
 
-\textbf{Hardware and runtime.} All timings come from one Apple M5 CPU running eager-mode PyTorch. Graph
-compilers (TorchScript, \texttt{torch.compile}, ONNX Runtime) fuse small operators and would likely create narrowing in the
-count penalty we observe. GPUs and microcontrollers would have very different overhead profiles. We
-therefore present latency \emph{trends} across architectures, not total numbers to be quoted for other
-platforms.\todo{optional: rerun latency\_sweep.py with torch.compile or on a Raspberry Pi / Colab GPU for a
-second hardware point}
+\ifcompact
+\textbf{Hardware and runtime.} All timings come from one Apple M5 CPU (eager PyTorch and \texttt{torch.compile}); other
+runtimes and hardware differ, so we report trends, not absolute numbers.
+\else
+\textbf{Hardware and runtime.} All timings come from one Apple M5 CPU. We measured eager PyTorch and
+\texttt{torch.compile}; other runtimes (ONNX Runtime, TensorRT) and other hardware (GPUs, microcontrollers, neural
+accelerators) have different overhead profiles. We therefore present latency \emph{trends} across architectures, not
+absolute numbers to be quoted for other platforms.
+\fi
 
 \textbf{Task design.} The chained task was written by the same author who designed \HB, so \HB's structural
 match to it is an intentional best case for modular inductive bias, not an unbiased test. We do not claim
-that staged modularity helps on unknown compositional problems, only that it \emph{can} when the
+that staged modularity helps on arbitrary compositional problems, only that it \emph{can} when the
 decomposition is known.
 
 \textbf{Statistics.} Five seeds detect large effects but not small ones. We report Welch's $t$-tests
-without multiple-comparison correction, so single and marginal results should be read as suggestive.
+without multiple-comparison correction, so isolated marginal results should be read as suggestive.
 Hyperparameters (learning rate, epochs, batch size) were fixed for all models rather than tuned per
-architecture, which may disadvantage architectures that give preference for other settings.
+architecture, which may disadvantage architectures that prefer other settings.

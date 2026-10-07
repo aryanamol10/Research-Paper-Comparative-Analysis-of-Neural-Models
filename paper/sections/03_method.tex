@@ -10,11 +10,13 @@ y_{\text{lin}}   &= 2x + \varepsilon, & \sigma&=1,\\
 y_{\text{curv}}  &= 0.5x^2 + \sin x + \varepsilon, & \sigma&=2,\\
 y_{\text{chain}} &= s_a + \sin(s_a) + 0.5\,\mathrm{sgn}(\sin x) + \varepsilon, & \sigma&=0.5,
 \end{align}
-where $s_a = x\cos(0.5x)$. The \emph{chained} target is a composition of three stages: a dynamic
-ramp, a non-linear instance applied to this ramp, and a discontinuous square wave. This was designed so for a model whose
+where $s_a = x\cos(0.5x)$. The \emph{chained} target is a composition of three stages: an oscillating
+ramp, a nonlinearity applied to that ramp, and a discontinuous square wave. This was designed so that a model whose
 structure mirrors the stages could, in principle, utilize it. Because the noise is known, each task has an
-indivisible test MSE of $\sigma^2$ (1, 4, and 0.25, respectively), which we use as a complete reference.
-Inputs are scaled to $[0,1]$; targets are left in their original units. A single random 80/20
+irreducible test MSE of $\sigma^2$ (1, 4, and 0.25, respectively), which we use as an absolute reference.
+Inputs are scaled to $[0,1]$. Targets are standardized with the training set's mean and standard deviation, the
+models are trained on the standardized values, and predictions are mapped back to original units, so every
+reported MSE is directly comparable to the noise floors. A single random 80/20
 train/test split (seed 42) is shared by every model and task, giving 4,000 training and 1,000 test points.
 
 \ifcompact\else  % dropped in the 6-page build
@@ -33,10 +35,10 @@ sinusoid with $\sigma=2$; (c)~a three-stage composition containing a square-wave
 \label{sec:archs}
 All six models (\cref{fig:arch}) are one-input, one-output multilayer models with ReLU
 activations~\cite{nair2010rectified}, each with exactly 385 trainable parameters, so that differences in accuracy
-or speed cannot be given to capacity. The one exception is \HC: no width pair for two-head wiring totals
+or speed cannot be attributed to capacity. The one exception is \HC: no width pair for two-head wiring totals
 385, so it uses the nearest configuration, 387 (+0.5\%). \Cref{tab:arch} lists their parameter counts,
-multiple accumulated operations (MACs) per sample, critical-path depth (linear layers between input and
-output), tensor operations given per forward call, and low-level (ATen) kernels those loops execute.
+multiply--accumulate operations (MACs) per sample, critical-path depth (linear layers between input and
+output), tensor operations dispatched per forward call, and the low-level (ATen) kernels those operations execute.
 
 \textbf{Single-paradigm baselines.} \emph{Sequential} is a 1--128--1 network. \emph{Parallel} feeds the input
 to two 64-unit branches whose activations are concatenated before a linear read-out, in the spirit of
@@ -60,14 +62,14 @@ other two to vary, and that difference is what lets us test which cost measure a
 \centering
 \caption{Architecture cost profile. Depth = linear layers on the longest input--output path. Ops = PyTorch
 tensor operations dispatched per forward call; Kern.\ = ATen kernels executed. Latency = median
-single-thread CPU inference time over 10 shuffled repeats.}
+single-thread CPU inference time over 10 shuffled repeats; comp.\ = after \texttt{torch.compile}.}
 \label{tab:arch}
-\setlength{\tabcolsep}{2.9pt}
-\begin{tabular}{@{}lrrrrrrr@{}}
+\setlength{\tabcolsep}{2.4pt}
+\begin{tabular}{@{}lrrrrrrrr@{}}
 \toprule
- & & \textbf{MACs/} & & & & \multicolumn{2}{c}{\textbf{Latency (\textmu s)}}\\
-\cmidrule(l){7-8}
-\textbf{Model} & \textbf{Params} & \textbf{sample} & \textbf{Depth} & \textbf{Ops} & \textbf{Kern.} & \textbf{b=1} & \textbf{b=4096}\\
+ & & \textbf{MACs/} & & & & \multicolumn{3}{c}{\textbf{Latency (\textmu s)}}\\
+\cmidrule(l){7-9}
+\textbf{Model} & \textbf{Params} & \textbf{sample} & \textbf{Depth} & \textbf{Ops} & \textbf{Kern.} & \textbf{b=1} & \textbf{comp.} & \textbf{4096}\\
 \midrule
 \tablebody{tables/tab_arch_body.tex}
 \bottomrule
@@ -75,25 +77,28 @@ single-thread CPU inference time over 10 shuffled repeats.}
 \end{table}
 
 \subsection{Training Protocol}
-Every model is implemented and trained in PyTorch~\cite{paszke2019pytorch} with one synchronized training loop. We use
+Every model is implemented and trained in PyTorch~\cite{paszke2019pytorch} with one shared training loop. We use
 Adam~\cite{kingma2015adam} (learning rate $10^{-3}$, $\beta=(0.9,0.999)$, $\epsilon=10^{-7}$, matching the Keras
 default used in the pilot), mean-squared-error loss, mini-batches of 32 with per-epoch shuffling, and
-100 epochs (12,500 optimizer steps). Each (model, task) pair is trained with five seeds (0--4) that control
-starting and batch order. We report mean\,$\pm$\,standard deviation across seeds, following
+100 epochs (12,500 optimizer steps). To test whether the chained-task results reflect undertraining, we also
+train Sequential, Parallel, \HA, and \HB on the chained task for 300 epochs under the same protocol. Each (model, task) pair is trained with five seeds (0--4) that control
+initialization and batch order. We report mean\,$\pm$\,standard deviation across seeds, following
 recommendations to account for training variance in benchmark comparisons~\cite{bouthillier2021accounting}.
 
 \subsection{Metrics}
 \begin{itemize}
 \item \textbf{Test MSE} and $R^2$ on the 1,000 held-out points after the final epoch.
 \item \textbf{Convergence epoch}: the first epoch whose test MSE is within 5\% of that run's best.
-\item \textbf{Training cost}: clock training time divided by optimizer steps (ms/step).
+\item \textbf{Training cost}: wall-clock training time divided by optimizer steps (ms/step).
 \item \textbf{Inference latency}: median of 50 forward passes over the full test set (batch 1{,}000).
 \end{itemize}
 Significance against the Sequential baseline uses Welch's two-sample $t$-test on test MSE ($n=5$ per arm,
-$p<0.05$).\ifcompact\ The linear task was re-timed after the control pair flagged CPU contention; accuracy was
-identical. \else During the first pass, the control pair flagged CPU contention on the linear task: two models'
-step times nearly doubled while their accuracy was unchanged. We re-timed that task in full. Accuracy was
-bit-identical across both passes, and only the clean timings are reported.\fi
+$p<0.05$).\ifcompact
+ One timing group with a contention outlier was re-measured; accuracy was identical.
+\else
+ One timing group (\HB, chained task) was re-measured after a single seed's inference time deviated by
+30\% from the same network on the other tasks; its accuracy was bit-identical across both passes.
+\fi
 
 \subsection{Latency Sweep}
 \label{sec:sweep}
@@ -102,17 +107,18 @@ model at batch sizes $\{1, 8, 64, 512, 1000, 4096\}$ with 1 and 4 CPU threads. E
 gets 50 warm-up calls followed by 1,000 timed calls, and the whole grid is repeated 10 times in a freshly shuffled
 order so that run order and cache state cannot result in bias towards any model. We report the median of the per-repeat medians,
 with a 95\% interval across repeats.
-MACs are counted with forward hooks on every linear layer. Dispatched operations are counted by crossed
+MACs are counted with forward hooks on every linear layer. Dispatched operations are counted by intercepting
 PyTorch's \texttt{\_\_torch\_function\_\_} protocol during one forward pass, and the kernels those operations
 execute are counted with \texttt{torch.profiler}. We also count \texttt{nn.Module} calls with forward
-hooks. These sweep timings are separate from the batch-1,000 inference
+hooks. Finally, we time batch-1 inference after compiling each model with \texttt{torch.compile} (default
+Inductor backend), using the same repeat protocol. These sweep timings are separate from the batch-1,000 inference
 times in \cref{tab:main}, which are measured on the trained models inside the training study; the two agree where
-they intersect.
+they overlap.
 
 \subsection{Environment}
 All main-study and sweep measurements run on a single machine (Apple M5 CPU, macOS, Python~3.9,
 PyTorch~\torchVersion) with \texttt{torch.set\_num\_threads(1)} unless stated otherwise, so the timings
 compare architectures rather than thread scheduling. No GPU is used: at this model scale, kernel-launch
-overhead would dominate against any GPU measurement~\cite{sze2017efficient}. \ifanonymous All code and raw results will be released publicly upon
+overhead would dominate any GPU measurement~\cite{sze2017efficient}. \ifanonymous All code and raw results will be released publicly upon
 publication.\else All code and raw results are available at
 \url{https://github.com/aryanamol10/Research-Paper-Comparative-Analysis-of-Neural-Models}.\fi

@@ -4,15 +4,15 @@
 \textbf{Depth versus breadth.} A single hidden layer of sufficient width can give an approximation of any continuous
 function~\cite{cybenko1989approximation,hornik1989multilayer}, yet depth-separation results show functions
 that deep networks represent far more efficiently than shallow ones~\cite{eldan2016power,telgarsky2016benefits},
-and width has its own limits~\cite{lu2017expressive}. These results concern represnted
-capacity. We ask the logical question that follows from them, which has us answer at a fixed, small parameter budget, which
-sequence trains to smallest amount of error, and which one runs fastest?
+and width has its own limits~\cite{lu2017expressive}. These results concern representational
+capacity. We ask the practical question that follows from them: at a fixed, small parameter budget, which
+arrangement trains to the lowest error, and which one runs fastest?
 
 \textbf{Multi-branch and shared-trunk designs.} Parallel branches are pivotal to Inception~\cite{szegedy2015going}
-and ResNeXt~\cite{xie2017resnext}, and wide remaining networks trade depth for width~\cite{zagoruyko2016wide}.
-A shared trunk with several heads is the joint learning pattern of multi-task
+and ResNeXt~\cite{xie2017resnext}, and wide residual networks trade depth for width~\cite{zagoruyko2016wide}.
+A shared trunk with several heads is the hard-parameter-sharing pattern of multi-task
 learning~\cite{caruana1997multitask,ruder2017overview}, and averaging several predictions underlies deep
-coordinations from different aspects~\cite{lakshminarayanan2017simple}. Our Parallel, \HA, and \HC models are small examples of these
+ensembles~\cite{lakshminarayanan2017simple}. Our Parallel, \HA, and \HC models are small examples of these
 ideas.
 
 \textbf{Modular networks.} Mixtures of experts route inputs to specific sub-networks~\cite{jacobs1991adaptive}
@@ -23,8 +23,8 @@ compositional structure at all is an open question~\cite{hupkes2020compositional
 version of this hypothesis, showing one module per stage of a known composition joined by dense
 connections~\cite{he2016resnet,huang2017densenet}.
 
-\textbf{Measuring efficiency.} Parameter count and FLOPs are known to be poor delegates for latency: ShuffleNet~V2
-derived architectures from directly measured speed~\cite{ma2018shufflenetv2}, and Dehghani et
+\textbf{Measuring efficiency.} Parameter count and FLOPs are known to be poor proxies for latency: ShuffleNet~V2
+derived design guidelines from directly measured speed~\cite{ma2018shufflenetv2}, and Dehghani et
 al.\ showed that the choice of cost indicator can reverse model rankings~\cite{dehghani2022efficiency}.
 Hardware-aware architecture search therefore optimizes measured latency~\cite{tan2019mnasnet,cai2019proxylessnas,elsken2019nas}.
 Standard benchmarks such as MLPerf Inference~\cite{reddi2020mlperf}, MLPerf Tiny~\cite{banbury2021mlperftiny},
@@ -32,9 +32,9 @@ and DAWNBench~\cite{coleman2019dawnbench} fix the measurement rules, and surveys
 explain where time goes in DNN inference~\cite{sze2017efficient,canziani2016analysis}. Efficient
 architectures for restricted devices~\cite{howard2017mobilenets} motivate studying very small models.
 Benchmarks are also fragile. Framework choice alone changes measured speed~\cite{shi2016benchmarking}, seed and
-data-split change can exceed the effects being claimed~\cite{bouthillier2021accounting,henderson2018deep},
+data-split variance can exceed the effects being claimed~\cite{bouthillier2021accounting,henderson2018deep},
 and empirical ML has a history of overstated conclusions~\cite{lipton2019troubling}. Our pilot study
-(\cref{sec:pilot}) shows a solid small-scale example of the first two problems.
+(\cref{sec:pilot}) shows a concrete small-scale example of the first two problems.
 
 \textbf{Positioning.} Prior latency studies target large vision or language models on accelerators. We study the
 opposite end, sub-kilobyte MLPs on a single CPU thread, where overhead is visible in

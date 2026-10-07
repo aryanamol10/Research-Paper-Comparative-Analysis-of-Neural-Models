@@ -2,7 +2,7 @@
 \label{sec:results}
 
 \Cref{tab:main} reports accuracy and cost for every (model, task) pair, \cref{fig:curves} shows test-error
-trajectories and behavior\ifcompact.\else, and \cref{fig:tradeoff} places each model on an accuracy-cost plane. \fi The latency sweep is shown in
+trajectories\ifcompact.\else, and \cref{fig:long} extends the chained task to 300 epochs. \fi The latency sweep is shown in
 \cref{fig:latency,fig:ops}.
 
 \begin{table*}[t]
@@ -25,13 +25,19 @@ $^\dagger$Welch's $t$-test vs.\ Sequential, $p<0.05$. Inference = forward pass o
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_curves}
-\caption{Test MSE per epoch (log scale, mean of five seeds). Hybrids reach low error in far fewer epochs on the
-curved and chained tasks. \HB (pink) is fastest to finish and ends lowest on the chained task.}
+\caption{Test MSE per epoch (log scale, mean of five seeds). With standardized targets every model converges within
+10 epochs on the simple tasks; on the chained task \HB (pink) ends lowest.}
 \label{fig:curves}
 \end{figure*}
 
 \subsection{The Control Pair: Identical Math, Different Code}
 \label{sec:res-control}
+\ifcompact
+Sequential and Modular compute the same function and produce identical test MSE; their training step times
+differ by \ctrlStepGap\%, so the pilot's \pilotSpeedup$\times$ ``Modular advantage'' (\cref{sec:pilot}) disappears. Their batch-1
+latency differs by \ctrlLatGap\% (non-overlapping 95\% intervals) because Sequential's container makes \modSequential\
+\texttt{nn.Module} calls against Modular's \modModular: code organization alone costs time.
+\else
 Sequential and Modular compute the same function and, under the same seed, produce the same test MSE on every
 task (\cref{tab:main}). Their training step times differ by only \ctrlStepGap\%, confirming that the pilot's
 \pilotSpeedup$\times$ ``Modular advantage'' (\cref{sec:pilot}) disappears once the framework and training loop
@@ -39,61 +45,77 @@ are held constant. Their batch-1 inference latency, however, differs by \ctrlLat
 \latOneModular\us), with non-overlapping 95\% intervals across ten shuffled repeats, so the gap is not run-order
 noise. Both dispatch three tensor operations, but Sequential's \texttt{nn.Sequential} container makes
 \modSequential\ \texttt{nn.Module} calls per forward pass against Modular's \modModular\ifcompact.\else. The control
-pair therefore isolates a second, purely software overhead, telling us how the code organization costs time even when the
+pair therefore isolates a second, purely software overhead, showing that code organization costs time even when the
 math is the same (\cref{sec:res-latency}).\fi
+\fi
 
 \subsection{Accuracy: Structure Pays Off Only When the Task Has Structure}
 \label{sec:res-acc}
-\textbf{Linear and curved tasks.} Every model reaches the noise floor on the linear task ($\text{MSE}\approx1$,
-$R^2=0.971$), and on the curved task every model finishes within 2\% of the floor of 4. Simple targets
-leave nothing for topology to improve upon, so at a 385-parameter budget the arrangement of parameters does not
-change the final accuracy. It does change \emph{how fast} the floor is reached. On the curved task \HB converges in
-\curvedConvHB\ epochs versus \curvedConvSeq\ for Sequential, about \curvedWallRatio$\times$ less
-training time to convergence (\curvedWallHB\,s vs.\ \curvedWallSeq\,s) despite its higher cost per step.
+\textbf{Linear and curved tasks.} Every model reaches the noise floor on the linear task (MSE 1.02--1.03 against a
+floor of 1, $R^2\approx0.97$), and on the curved task every model finishes within 2\% of the floor of 4. Simple
+targets leave nothing for topology to improve upon, so at a 385-parameter budget the arrangement of parameters does
+not change the final accuracy. With standardized targets, every model also converges quickly, within 10 epochs on
+either task.
 
-\ifcompact\else  % dropped in the 6-page build
-\textbf{Narrow trunks are fragile.} \HC's trunk width also matters for reliability. In a preliminary
-configuration with a 17--17 trunk (376 parameters), one of five curved-task seeds settled in a poor solution
-(MSE 21.4 vs.\ $\approx$4.0 for the rest). The exact-budget 20--15 trunk used here trains reliably on every
-seed, but it still has the largest spread on the curved task.
+\textbf{Chained task.} Here topology matters, but only for the hybrid built for it. \HB, whose modules mirror the
+three stages of the target, reaches \mseChainHB\ test MSE, \chainHBGain\% below Sequential (\mseChainSequential;
+$p<0.05$), and its excess error over the noise floor of 0.25 (\chainExcessHB) is \chainExcessRatio$\times$ smaller
+than Sequential's (\chainExcessSeq). \HA, which has no knowledge of the stages, only matches Sequential
+(\mseChainHA), and plain breadth does not help: Parallel is the worst model (\mseChainParallel).
+
+\ifcompact
+\textbf{Undertraining or a ceiling?} Trained for 300 epochs, every model improves (Sequential to \longSeqThree), but
+\HB still ends \longHBGain\% lower (\longHBThree; $p=\longHBpval$), so the gap is not an artifact of the 100-epoch budget.
+\else
+\textbf{Undertraining or a ceiling?} At 100 epochs the chained-task models are still improving, so we trained
+Sequential, Parallel, \HA, and \HB for 300 epochs\ifcompact\else\ (\cref{fig:long})\fi. Every model improves:
+Sequential falls \longSeqDrop\% to \longSeqThree, and Parallel (\longParThree) catches up with it. The \HB advantage
+persists: it ends at \longHBThree, \longHBGain\% below Sequential ($p=\longHBpval$), with \longExcessRatio$\times$
+smaller excess error. Gains level off late (the last 1\% improvement comes after epoch \longHBPlateau\ for \HB and
+\longSeqPlateau\ for Sequential, on average), so these values are close to each model's ceiling at this budget. The
+gap is not an artifact of the 100-epoch training budget.
 \fi
 
-\textbf{Chained task.} Here topology matters. \HB, in which the modules mirror the three stages of the target,
-reaches \mseChainHB\ test MSE, \chainHBGain\% below Sequential (\mseChainSequential; $p<0.05$). \HA, which has no
-knowledge of the stages, still improves by \chainHAGain\% (\mseChainHA; $p<0.05$). Measured against the noise floor
-of 0.25, \HB's excess error (\chainExcessHB) is \chainExcessRatio$\times$ smaller than Sequential's
-(\chainExcessSeq). Both hybrids also have much smaller variance ($\pm$0.02 vs.\ $\pm$0.12). The
-single-paradigm models are still improving at epoch 100 (\cref{fig:curves}c), so part of their gap is slower
-convergence rather than a lower ceiling. At a fixed budget, the gap is what a practitioner would get.
-Plain breadth does not help: Parallel is the worst model on the chained task (\mseChainParallel).
-
 \ifcompact\else  % dropped in the 6-page build
-\begin{figure*}[t]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_tradeoff}
-\caption{Accuracy vs.\ training cost. The $y$-axis is test MSE divided by the best model's MSE on that task (1 =
-best). Error bars are $\pm$1 std over the seeds. On simple tasks all models tie on accuracy, so the cheapest
-model wins. On the chained task, accuracy can be bought with per-step cost.}
-\label{fig:tradeoff}
-\end{figure*}
+\includegraphics[width=\columnwidth]{fig_long}
+\caption{Chained-task test MSE from epoch 10 to 300 (mean of five seeds). The dashed line marks the 100-epoch budget
+of the main study. \HB stays lowest throughout; Parallel catches up with Sequential.}
+\label{fig:long}
+\end{figure}
 \fi
 
 \subsection{Latency: Operator Count, Not Parameter Count}
 \label{sec:res-latency}
-\Cref{tab:arch} and \cref{fig:ops} show that, at a nearly constant parameter budget, single inference
+\Cref{tab:arch} and \cref{fig:ops} show that, at a nearly constant parameter budget, single-sample inference
 latency spans almost 4$\times$, from \latOneModular\us (Modular) to \latOneHB\us (\HB). Parameter count
 cannot explain this: all models have 385--387 parameters. Neither can MACs: Parallel and Sequential have the
 same 256 MACs, but Parallel is slower, and \HC has the most MACs (350) but is faster than \HA and \HB. What does
 explain it is the number of tensor operations dispatched per forward call. A linear fit of batch-1 latency on
 operation count gives $R^2=\opsFitRsq$ with a slope of about \opsFitSlope\us per operation. At this scale, each
-\texttt{Linear}, \texttt{ReLU}, \texttt{cat}, or add pays a constant framework transmission cost that lessens its
+\texttt{Linear}, \texttt{ReLU}, \texttt{cat}, or add pays a fixed framework dispatch cost that dwarfs its
 arithmetic. \HB has 13 operations and runs \latOneRatioHB$\times$ slower than Sequential. Counting the ATen
 kernels those operations execute gives an equally good fit ($R^2=\kernFitRsq$), so the effect is not an artifact
 of how we count.\ifcompact\ Adding \texttt{nn.Module} calls as a second predictor gives $R^2=\opsModFitRsq$ (descriptive only;
 six points).\else Adding the number of \texttt{nn.Module} calls as a second predictor explains almost all
 remaining variance ($R^2=\opsModFitRsq$; roughly \perOpUs\us per operation and \perModUs\us per module call),
 including the Sequential/Modular gap. With six architectures and three fitted coefficients, we treat this
-decomposition as being informative rather than predictive.\fi
+decomposition as descriptive rather than predictive.\fi
+
+\ifcompact
+\textbf{Compilation.} With \texttt{torch.compile} (\cref{tab:arch}, comp.), the batch-1 spread narrows from
+\eagerSpread$\times$ to \compSpread$\times$, but a fixed per-call cost of about 10\us makes the three-operation models slower;
+\HB remains the slowest (\compRatioHB$\times$ Sequential).
+\else
+\textbf{Compilation.} \texttt{torch.compile} fuses each model's operations into one compiled graph (\cref{tab:arch},
+column comp.). This narrows the batch-1 spread from \eagerSpread$\times$ to \compSpread$\times$
+(\compModular--\compHB\us) and weakens the link to operator count ($R^2=\compFitRsq$), but it adds a fixed per-call
+cost of about 10\us. The three-operation models therefore become slower (Sequential \latOneSequential\ to
+\compSequential\us), while the operator-heavy hybrids become faster (\HA \latOneHA\ to \compHA\us). \HB remains the
+slowest model (\compRatioHB$\times$ Sequential). For sub-kilobyte models at batch 1, compilation trades per-operator
+cost for per-call cost rather than giving a free speedup.
+\fi
 
 \begin{figure}[t]
 \centering
@@ -130,14 +152,14 @@ this small and sometimes hurt (Parallel at batch 1,000).}
 latency is nearly flat and ordered by operator count. Past roughly 500 samples, per-element work takes over
 and the ordering reshuffles. At batch 4096, \HC becomes the \emph{fastest} model (\latBigHC\us vs.\
 \latBigSequential\us for Sequential) despite having the most MACs. This is consistent with memory traffic
-having more value than arithmetic: \HC's widest activation is 20 values per sample, while Sequential's is 128 and
+mattering more than arithmetic: \HC's widest activation is 20 values per sample, while Sequential's is 128 and
 Parallel's concatenation writes 128 more. The two models that build intermediate concatenated tensors are the
-slowest at batch 4096: \HB (\latBigHB\us) and Parallel (\latBigParallel\us). The latency ranking of these architectures, for this reason, depends on the batch size at of which it
-is being measured.
+slowest at batch 4096: \HB (\latBigHB\us) and Parallel (\latBigParallel\us). The latency ranking of these architectures therefore depends on the batch size at which it
+is measured.
 
 \ifcompact\else  % dropped in the 6-page build (4-thread panel not shown)
-\textbf{Threads.} With four occuring threads\ifcompact\else\ (\cref{fig:latency}b)\fi, batch-1 latency is unchanged. At larger batches the
-effect is not the same. Sequential improves at batch 4096 (\latBigSequential\ to \threadSeqBigFour\us), but
+\textbf{Threads.} With four intra-op threads\ifcompact\else\ (\cref{fig:latency}b)\fi, batch-1 latency is unchanged. At larger batches the
+effect is inconsistent. Sequential improves at batch 4096 (\latBigSequential\ to \threadSeqBigFour\us), but
 Parallel at batch 1,000 slows from \threadParallelOne\ to \threadParallelFour\us and \HA at batch 4096 slows to
-\threadHABigFour\us. For below kilobyte models, thread synchronization overhead can go over the parallel work.
+\threadHABigFour\us. For sub-kilobyte models, thread synchronization overhead can exceed the parallel work.
 \fi

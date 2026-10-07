@@ -2,22 +2,11 @@
 \label{sec:pilot}
 
 Before the main study, we ran a pilot benchmark (Benchmark~1) of the three single-paradigm models in a
-Google Colab notebook. Its headline result was noticable: the Modular network trained about
-\pilotSpeedup$\times$ faster than Sequential and Parallel on every task\ifcompact\else\ (\cref{fig:pilot}, \cref{tab:pilot})\fi,
-and its accuracy was only a fraction worse. Taken at face value, this suggests that modularity is a free
+Google Colab notebook. Its headline result was striking: the Modular network trained about
+\pilotSpeedup$\times$ faster than Sequential and Parallel on every task\ifcompact\else\ (\cref{tab:pilot})\fi,
+and its accuracy was only marginally worse. Taken at face value, this suggests that modularity is a free
 latency win. Auditing the pilot showed that the result has nothing to do with architecture. We report the
 audit because each flaw is common in small-scale benchmarking~\cite{lipton2019troubling,bouthillier2021accounting}.
-
-\ifcompact\else  % dropped in the 6-page build
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_pilot}
-\caption{Pilot (Benchmark~1) training time. The Modular network appears $\sim$\pilotSpeedup$\times$
-faster, but it was the only model implemented in PyTorch, and it is functionally identical to Sequential.
-The gap measures framework overhead, not architecture.}
-\label{fig:pilot}
-\end{figure}
-\fi
 
 \ifcompact\else  % dropped in the 6-page build
 \begin{table}[t]
@@ -43,16 +32,16 @@ Keras/TensorFlow~\cite{abadi2016tensorflow,chollet2015keras} using \texttt{model
 hand-written PyTorch loop. Modular and Sequential compute the same 1--128--1 function, so the
 $\sim$11\,s gap is entirely framework and training-loop overhead. Framework-level differences of this size
 are well documented~\cite{shi2016benchmarking}. They show that any timing comparison across frameworks
-does not yielf much about architecture.
+says little about architecture.
 
 \textbf{Confound 2: uninformative inputs.} The pilot trained on $x\sim\mathcal U(0,1)$ drawn
 independently of the targets, which were computed on the evenly spaced grid. With no information in the
-inputs, the best any model can do is predict the target mean, which gives an MSE equal to the target change.
+inputs, the best any model can do is predict the target mean, which gives an MSE equal to the target variance.
 The reported losses (37.8, 240, 10.4) sit just above those variances (34.7, 228.8, 10.0). In other words,
 none of the pilot models learned the task, so their accuracy ranking is noise.
 
 \textbf{Confound 3: no held-out data, one seed.} Losses were final-epoch \emph{training} losses from a single
-seed with shuffling disabled, so neither generalization nor running variance could be assessed.
+seed with shuffling disabled, so neither generalization nor run-to-run variance could be assessed.
 
 The main study (\cref{sec:method}) fixes all three: one framework and one training loop, true inputs, a held-out
 split, and five seeds. The identical Sequential/Modular pair stays in as a built-in check. If the protocol is
