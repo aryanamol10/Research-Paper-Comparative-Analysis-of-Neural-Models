@@ -61,8 +61,8 @@ other two to vary, and that difference is what lets us test which cost measure a
 \begin{table}[t]
 \centering
 \caption{Architecture cost profile. Depth: linear layers on the longest path. Ops / Kern.: PyTorch operations /
-ATen kernels per forward call. Latency: median single-thread CPU time over 10 shuffled repeats; comp.: with
-\texttt{torch.compile}.}
+ATen kernels per forward call. Latency: median single-thread CPU time over 10 shuffled repeats; comp.: compiled with
+torch.compile.}
 \label{tab:arch}
 \setlength{\tabcolsep}{2.4pt}
 \begin{tabular}{@{}lrrrrrrrr@{}}
@@ -93,10 +93,10 @@ recommendations to account for training variance in benchmark comparisons~\cite{
 \item \textbf{Inference latency}: median of 50 forward passes over the full test set (batch 1{,}000).
 \end{itemize}
 Significance against the Sequential baseline uses Welch's two-sample $t$-test on test MSE ($n=5$ per arm,
-$p<0.05$).\ifcompact
- One timing group with a contention outlier was re-measured; accuracy was identical.
+$p<0.05$). \ifcompact
+One timing group with a contention outlier was re-measured; accuracy was identical.
 \else
- One timing group (\HB, chained task) was re-measured after a single seed's inference time deviated by
+One timing group (\HB, chained task) was re-measured after a single seed's inference time deviated by
 30\% from the same network on the other tasks; its accuracy was bit-identical across both passes.
 \fi
 

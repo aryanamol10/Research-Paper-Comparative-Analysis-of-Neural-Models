@@ -46,8 +46,7 @@ math is the same (\cref{sec:res-latency}).\fi
 \textbf{Linear and curved tasks.} Every model reaches the noise floor on the linear task (MSE 1.02--1.03 against a
 floor of 1, $R^2\approx0.97$), and on the curved task every model finishes within 2\% of the floor of 4. Simple
 targets leave nothing for topology to improve upon, so at a 385-parameter budget the arrangement of parameters does
-not change the final accuracy. With standardized targets, every model also converges quickly, within 10 epochs on
-either task.
+not change the final accuracy. With standardized targets, every model also converges quickly, on average within 10 epochs.
 
 \textbf{Chained task.} Here topology matters, but only for the hybrid built for it. \HB, whose modules mirror the
 three stages of the target, reaches \mseChainHB\ test MSE, \chainHBGain\% below Sequential (\mseChainSequential;
@@ -112,7 +111,7 @@ cost for per-call cost rather than giving a free speedup.
 \includegraphics[width=\columnwidth]{fig_ops_latency}
 \caption{Batch-1 inference latency vs.\ tensor operations per forward call. Parameter counts are in
 parentheses; error bars are 95\% intervals across ten shuffled repeats. Latency is almost perfectly
-explained by the operator count ($R^2=\opsFitRsq$) and is unrelated to the actual parameter count.}
+explained by the operator count ($R^2=\opsFitRsq$), not by parameter count.}
 \label{fig:ops}
 \end{figure}
 
